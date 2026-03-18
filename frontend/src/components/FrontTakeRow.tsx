@@ -22,7 +22,7 @@ export default function FrontTakeRow({ piles, maxTake, gameActive, onTake }: Fro
   const bracketCount = Math.min(maxTake, piles.length);
 
   return (
-    <div className={`bg-hextech-panel/40 backdrop-blur-sm shadow-2xl border border-hextech-border min-h-[160px] w-full py-8 px-4 relative overflow-hidden`}>
+    <div className={`bg-hextech-panel/40 backdrop-blur-sm shadow-2xl border border-hextech-border min-h-[140px] md:min-h-[160px] w-full py-6 px-2 md:py-8 md:px-4 relative overflow-hidden`}>
       <div className="absolute inset-0 bg-[linear-gradient(rgba(200,155,60,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,155,60,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
       <div className="flex-1 relative mx-4 min-w-0 flex items-center h-full">
@@ -30,8 +30,8 @@ export default function FrontTakeRow({ piles, maxTake, gameActive, onTake }: Fro
         <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#1e2328] to-transparent pointer-events-none z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#1e2328] to-transparent pointer-events-none z-10" />
         
-        <div className="overflow-x-auto custom-scrollbar flex items-center w-full px-2 py-4">
-          <div className="flex flex-nowrap items-center min-w-max gap-4 px-8 relative mt-6">
+        <div className="overflow-x-auto custom-scrollbar flex items-center w-full px-1 md:px-2 py-4">
+          <div className="flex flex-nowrap items-center min-w-max gap-2 md:gap-4 px-4 md:px-8 relative mt-6">
             
             {/* Valid Selection Bracket */}
             {gameActive && bracketCount > 0 && (

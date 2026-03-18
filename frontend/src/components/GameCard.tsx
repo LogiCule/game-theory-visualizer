@@ -49,7 +49,7 @@ export default function GameCard({ title, description, route }: GameCardProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(route)}
-      className="h-[300px] [perspective:1000px] cursor-pointer"
+      className="h-[250px] md:h-[300px] [perspective:1000px] cursor-pointer"
     >
       <div 
         ref={contentRef}
@@ -65,19 +65,19 @@ export default function GameCard({ title, description, route }: GameCardProps) {
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-hextech-gold opacity-30 group-hover:opacity-100 transition-opacity m-1" />
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-hextech-gold opacity-30 group-hover:opacity-100 transition-opacity m-1" />
 
-        <div className="p-8 flex-grow" style={{ transform: 'translateZ(30px)' }}>
-          <h2 className="text-2xl font-bold text-hextech-gold-light tracking-widest uppercase mb-2 group-hover:text-hextech-gold transition-colors drop-shadow-md">{title}</h2>
-          <div className="h-px w-10 bg-hextech-blue mb-4 group-hover:w-full transition-all duration-500 shadow-[0_0_8px_var(--color-hextech-blue)]" />
-          <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+        <div className="p-6 md:p-8 flex-grow" style={{ transform: 'translateZ(30px)' }}>
+          <h2 className="text-xl md:text-2xl font-bold text-hextech-gold-light tracking-widest uppercase mb-2 group-hover:text-hextech-gold transition-colors drop-shadow-md">{title}</h2>
+          <div className="h-px w-10 bg-hextech-blue mb-3 md:mb-4 group-hover:w-full transition-all duration-500 shadow-[0_0_8px_var(--color-hextech-blue)]" />
+          <p className="text-gray-400 text-xs md:text-sm leading-relaxed">{description}</p>
         </div>
         
-        <div className="px-8 pb-8 mt-auto" style={{ transform: 'translateZ(40px)' }}>
+        <div className="px-6 pb-6 md:px-8 md:pb-8 mt-auto" style={{ transform: 'translateZ(40px)' }}>
           <button
             onClick={(e) => {
               e.stopPropagation();
               navigate(route);
             }}
-            className="w-full relative overflow-hidden inline-flex items-center justify-center bg-hextech-dark/80 border border-hextech-gold/30 hover:border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-hextech-gold/10 hover:shadow-[0_0_15px_rgba(200,155,60,0.3)] font-bold py-3 px-4 transition-all duration-300 uppercase tracking-widest text-sm cursor-pointer"
+            className="w-full relative overflow-hidden inline-flex items-center justify-center bg-hextech-dark/80 border border-hextech-gold/30 hover:border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-hextech-gold/10 hover:shadow-[0_0_15px_rgba(200,155,60,0.3)] font-bold py-2 md:py-3 px-4 transition-all duration-300 uppercase tracking-widest text-xs md:text-sm cursor-pointer"
           >
             Play
           </button>
