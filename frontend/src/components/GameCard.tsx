@@ -79,7 +79,7 @@ export default function GameCard({ title, description, route }: GameCardProps) {
             }}
             className="w-full relative overflow-hidden inline-flex items-center justify-center bg-hextech-dark/80 border border-hextech-gold/30 hover:border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-hextech-gold/10 hover:shadow-[0_0_15px_rgba(200,155,60,0.3)] font-bold py-3 px-4 transition-all duration-300 uppercase tracking-widest text-sm cursor-pointer"
           >
-            Play Session
+            Play
           </button>
         </div>
       </div>

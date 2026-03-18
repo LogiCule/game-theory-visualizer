@@ -35,7 +35,7 @@ export default function HomePage() {
         <header className="text-center mb-24 stagger-item">
           <div className="inline-block relative">
             <h1 className="text-5xl md:text-6xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-hextech-gold-light to-hextech-gold mb-6 uppercase drop-shadow-2xl">
-              Strategy Client
+              Strategy Simulator
             </h1>
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-hextech-gold to-transparent" />
           </div>
@@ -52,7 +52,20 @@ export default function HomePage() {
               route="/games/stone-game"
             />
           </div>
-          {/* Future cards */}
+          <div className="stagger-item">
+            <GameCard
+              title="Stone Game II"
+              description="Take up to 2M stones from the front of the line. M scales up dynamically. Plan your exponential expansion."
+              route="/games/stone-game-2"
+            />
+          </div>
+          <div className="stagger-item">
+            <GameCard
+              title="Stone Game III"
+              description="A ruthless battle where stones have values that can be negative. Take 1, 2, or 3 stones from the front."
+              route="/games/stone-game-3"
+            />
+          </div>
         </div>
       </div>
     </div>
