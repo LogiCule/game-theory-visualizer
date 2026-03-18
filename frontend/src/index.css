@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hextech-blue: #0ac8b9;
+  --color-hextech-gold: #c89b3c;
+  --color-hextech-gold-light: #f0e6d2;
+  --color-hextech-dark: #0a0a0c;
+  --color-hextech-panel: #1e2328;
+  --color-hextech-border: #463714;
+  --color-stone-pile: #0ac8b9;
+  --color-stone-pile-hover: #00ffeb;
+  --color-alice: #c89b3c;
+  --color-bob: #0ac8b9;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0a0a0c] text-[#f0e6d2];
+    background-image: 
+      radial-gradient(circle at top right, rgba(10, 200, 185, 0.05), transparent 40%),
+      radial-gradient(circle at bottom left, rgba(200, 155, 60, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #463714;
+}
+
+@keyframes shine {
+  100% {
+    transform: translateX(100%) skewX(12deg);
+  }
+}
+

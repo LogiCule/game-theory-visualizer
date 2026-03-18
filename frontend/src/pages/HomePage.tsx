@@ -1,0 +1,60 @@
+import { useRef } from 'react';
+import GameCard from '../components/GameCard';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
+
+export default function HomePage() {
+  const container = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // Entrance animations
+    gsap.from('.stagger-item', {
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+    });
+    
+    gsap.from('.header-glow', {
+      scale: 0.8,
+      opacity: 0,
+      duration: 1.5,
+      ease: 'power2.out',
+    });
+  }, { scope: container });
+
+  return (
+    <div ref={container} className="min-h-screen p-8 text-hextech-gold-light relative overflow-hidden flex flex-col items-center pt-24">
+      {/* Background flare */}
+      <div className="header-glow absolute top-[-10%] left-1/2 transform -translate-x-1/2 w-[800px] h-[500px] bg-hextech-blue/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl w-full mx-auto relative z-10">
+        <header className="text-center mb-24 stagger-item">
+          <div className="inline-block relative">
+            <h1 className="text-5xl md:text-6xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-hextech-gold-light to-hextech-gold mb-6 uppercase drop-shadow-2xl">
+              Strategy Client
+            </h1>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-hextech-gold to-transparent" />
+          </div>
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light tracking-wide mt-6">
+            A portal to interact with algorithmic domains.
+          </p>
+        </header>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="stagger-item">
+            <GameCard
+              title="Stone Game I"
+              description="Two players pick stones from either end of a row of piles. Both players play optimally. Defeat your opponent through perfect calculation."
+              route="/games/stone-game"
+            />
+          </div>
+          {/* Future cards */}
+        </div>
+      </div>
+    </div>
+  );
+}
