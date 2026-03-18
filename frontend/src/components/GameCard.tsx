@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import TagBadge from './TagBadge';
 
 gsap.registerPlugin(useGSAP);
 
@@ -9,9 +10,11 @@ interface GameCardProps {
   title: string;
   description: string;
   route: string;
+  tags?: string[];
+  onTagClick?: (tag: string) => void;
 }
 
-export default function GameCard({ title, description, route }: GameCardProps) {
+export default function GameCard({ title, description, route, tags = [], onTagClick }: GameCardProps) {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -49,7 +52,7 @@ export default function GameCard({ title, description, route }: GameCardProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={() => navigate(route)}
-      className="h-[250px] md:h-[300px] [perspective:1000px] cursor-pointer"
+      className="h-[300px] md:h-[350px] [perspective:1000px] cursor-pointer"
     >
       <div 
         ref={contentRef}
@@ -65,10 +68,22 @@ export default function GameCard({ title, description, route }: GameCardProps) {
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-hextech-gold opacity-30 group-hover:opacity-100 transition-opacity m-1" />
         <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-hextech-gold opacity-30 group-hover:opacity-100 transition-opacity m-1" />
 
-        <div className="p-6 md:p-8 flex-grow" style={{ transform: 'translateZ(30px)' }}>
+        <div className="p-6 md:p-8 flex-grow flex flex-col" style={{ transform: 'translateZ(30px)' }}>
           <h2 className="text-xl md:text-2xl font-bold text-hextech-gold-light tracking-widest uppercase mb-2 group-hover:text-hextech-gold transition-colors drop-shadow-md">{title}</h2>
           <div className="h-px w-10 bg-hextech-blue mb-3 md:mb-4 group-hover:w-full transition-all duration-500 shadow-[0_0_8px_var(--color-hextech-blue)]" />
-          <p className="text-gray-400 text-xs md:text-sm leading-relaxed">{description}</p>
+          <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-4">{description}</p>
+          
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-auto">
+              {tags.map((tag) => (
+                <TagBadge 
+                  key={tag} 
+                  tag={tag} 
+                  onClick={onTagClick ? (e) => { e.stopPropagation(); onTagClick(tag); } : undefined} 
+                />
+              ))}
+            </div>
+          )}
         </div>
         
         <div className="px-6 pb-6 md:px-8 md:pb-8 mt-auto" style={{ transform: 'translateZ(40px)' }}>

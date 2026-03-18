@@ -43,3 +43,7 @@
   }
 }
 
+body.disable-blur * {
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
