@@ -5,9 +5,11 @@ interface PileRowProps {
   onTakeLeft: () => void;
   onTakeRight: () => void;
   gameActive: boolean;
+  highlightLeft?: boolean;
+  highlightRight?: boolean;
 }
 
-export default function PileRow({ piles, onTakeLeft, onTakeRight, gameActive }: PileRowProps) {
+export default function PileRow({ piles, onTakeLeft, onTakeRight, gameActive, highlightLeft, highlightRight }: PileRowProps) {
   if (piles.length === 0) {
     return (
       <div className="h-40 flex items-center justify-center bg-hextech-dark/50 backdrop-blur-sm border border-hextech-border rounded-none shadow-inner">
@@ -33,6 +35,7 @@ export default function PileRow({ piles, onTakeLeft, onTakeRight, gameActive }: 
           selectable={gameActive}
           onClick={onTakeLeft}
           position="left"
+          highlight={highlightLeft}
         />
       </div>
 
@@ -70,6 +73,7 @@ export default function PileRow({ piles, onTakeLeft, onTakeRight, gameActive }: 
             selectable={gameActive}
             onClick={onTakeRight}
             position="right"
+            highlight={highlightRight}
           />
         </div>
       )}

@@ -3,9 +3,10 @@ interface PileTileProps {
   selectable: boolean;
   onClick: () => void;
   position: 'left' | 'right' | 'middle';
+  highlight?: boolean;
 }
 
-export default function PileTile({ value, selectable, onClick, position }: PileTileProps) {
+export default function PileTile({ value, selectable, onClick, position, highlight }: PileTileProps) {
   return (
     <button
       onClick={onClick}
@@ -18,6 +19,7 @@ export default function PileTile({ value, selectable, onClick, position }: PileT
           ? 'bg-hextech-panel border border-hextech-blue/50 text-hextech-gold-light cursor-pointer transform hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(10,200,185,0.2)] z-10' 
           : 'bg-hextech-dark/50 border border-hextech-border text-hextech-border cursor-not-allowed opacity-60'
         }
+        ${highlight ? 'animate-pulse ring-2 ring-hextech-blue shadow-[0_0_20px_rgba(10,200,185,0.6)] !border-hextech-blue !bg-hextech-blue/10' : ''}
       `}
       style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%)' }}
     >
