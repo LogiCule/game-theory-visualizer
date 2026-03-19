@@ -47,13 +47,18 @@ export default function NimGamePage() {
 
   useEffect(() => {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
+      let active = true;
       const timer = setTimeout(() => {
-        const move = engine.getOptimalMove(gameState);
-        if (move !== null) {
-          setGameState(prev => prev ? engine.applyMove(prev, move) : null);
-        }
+        analysisService.getBestMove('nim-game', gameState).then(move => {
+          if (active && move !== null) {
+            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+          }
+        });
       }, 1000);
-      return () => clearTimeout(timer);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
     }
   }, [gameState, gameMode, engine]);
 

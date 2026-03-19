@@ -14,6 +14,7 @@ export default function Connect4Page() {
   const [showPrediction, setShowPrediction] = useState(false);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
   const [lastMove, setLastMove] = useState<{row: number, col: number} | null>(null);
+  const [hint, setHint] = useState<{col: number} | null>(null);
   const [prediction, setPrediction] = useState<any>(null);
   
   const engine = useMemo(() => new Connect4Engine(), []);
@@ -40,6 +41,7 @@ export default function Connect4Page() {
     setGameState(engine.getInitialState());
     setShowPrediction(false);
     setLastMove(null);
+    setHint(null);
   };
 
   const getTargetRow = (board: (Player | null)[][], c: number) => {
@@ -59,15 +61,24 @@ export default function Connect4Page() {
 
   useEffect(() => {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
+      let active = true;
+      setHint(null);
       const timer = setTimeout(() => {
-        const move = engine.getOptimalMove(gameState);
-        if (move) {
-          const targetRow = getTargetRow(gameState.board, move.col);
-          setGameState(prev => prev ? engine.applyMove(prev, move) : null);
-          setLastMove({ row: targetRow, col: move.col });
-        }
+        analysisService.getBestMove('connect-4', gameState, (progress) => {
+          if (active) setHint(progress.result);
+        }).then(move => {
+          if (active && move) {
+            setHint(null);
+            const targetRow = getTargetRow(gameState.board, move.col);
+            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setLastMove({ row: targetRow, col: move.col });
+          }
+        });
       }, 500); 
-      return () => clearTimeout(timer);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
     }
   }, [gameState, gameMode, engine]);
 
@@ -168,16 +179,18 @@ export default function Connect4Page() {
 
           <div className="relative mt-2 mb-10 w-fit">
             
-            {/* Column indicators for optimal move / hover */}
+            {/* Column indicators for optimal move / hover / hint */}
             <div className="flex justify-between w-full absolute -top-10 left-0 right-0 h-8 pointer-events-none z-20">
                 {Array.from({ length: 7 }).map((_, c) => {
                    const isOptimal = showPrediction && prediction?.optimalMove?.col === c;
+                   const isHint = hint?.col === c;
                    return (
                      <div key={c} className="w-10 sm:w-16 flex items-end justify-center h-full">
                         <div className={`
                           w-0 h-0 border-l-[12px] border-r-[12px] border-t-[16px] border-l-transparent border-r-transparent transition-all duration-300
                           ${isOptimal ? 'border-t-hextech-blue drop-shadow-[0_0_12px_rgba(10,200,185,0.8)] animate-bounce' : 'border-t-transparent'}
-                          ${hoverCol === c && gameActive && !isOptimal ? 'border-t-hextech-gold/80' : ''}
+                          ${isHint && !isOptimal ? 'border-t-[#0ac8b9] animate-pulse opacity-70' : ''}
+                          ${hoverCol === c && gameActive && !isOptimal && !isHint ? 'border-t-hextech-gold/80' : ''}
                         `} />
                      </div>
                    )

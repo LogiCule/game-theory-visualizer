@@ -46,13 +46,18 @@ export default function TicTacToePage() {
 
   useEffect(() => {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
+      let active = true;
       const timer = setTimeout(() => {
-        const move = engine.getOptimalMove(gameState);
-        if (move) {
-          setGameState(prev => prev ? engine.applyMove(prev, move) : null);
-        }
+        analysisService.getBestMove('tic-tac-toe', gameState).then(move => {
+          if (active && move) {
+            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+          }
+        });
       }, 500); 
-      return () => clearTimeout(timer);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
     }
   }, [gameState, gameMode, engine]);
 
