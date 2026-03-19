@@ -6,21 +6,34 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { getAnalyzerForGame } from '../games/analyzerRegistry';
+import { analysisService } from '../services/analysisService';
 
 export default function StoneGamePage() {
   const [inputVal, setInputVal] = useState('5, 3, 4, 5');
   const [gameState, setGameState] = useState<StoneGameState | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
   const [showPrediction, setShowPrediction] = useState(false);
+  const [prediction, setPrediction] = useState<any>(null);
   
   const engine = useMemo(() => new StoneGameEngine(), []);
-  const analyzer = useMemo(() => getAnalyzerForGame('stone-game-1'), []);
 
-  const prediction = useMemo(() => {
-    if (!showPrediction || !gameState || gameState.gameOver || !analyzer) return null;
-    return analyzer.analyze(gameState);
-  }, [showPrediction, gameState, analyzer]);
+  useEffect(() => {
+    if (!showPrediction || !gameState || gameState.gameOver) {
+      setPrediction(null);
+      return;
+    }
+
+    let active = true;
+    analysisService.analyze('stone-game-1', gameState).then((res: any) => {
+      if (active) {
+        setPrediction(res);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [showPrediction, gameState]);
 
   const startGame = () => {
     setGameState(engine.getInitialState(inputVal));

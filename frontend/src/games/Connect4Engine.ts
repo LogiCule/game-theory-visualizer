@@ -127,6 +127,29 @@ export class Connect4Engine extends TwoPlayerGameEngine<Connect4State, Connect4M
   }
 
   // --- MINIMAX AI ---
+  private memo = new Map<string, number>();
+
+  public clearMemo() {
+    this.memo.clear();
+  }
+
+  public serialize(board: (Player | null)[][], currentPlayer: Player): string {
+    return board.map(row => row.map(c => c === 'Alice' ? 'A' : c === 'Bob' ? 'B' : '.').join('')).join('') + currentPlayer;
+  }
+
+  public dropPiece(board: (Player | null)[][], col: number, player: Player): number {
+    for (let r = this.ROWS - 1; r >= 0; r--) {
+      if (board[r][col] === null) {
+        board[r][col] = player;
+        return r;
+      }
+    }
+    return -1;
+  }
+
+  public removePiece(board: (Player | null)[][], row: number, col: number): void {
+    board[row][col] = null;
+  }
 
   public getOptimalMove(state: Connect4State, depthLimit = 5): Connect4Move | null {
     if (this.isTerminal(state)) return null;
@@ -137,55 +160,84 @@ export class Connect4Engine extends TwoPlayerGameEngine<Connect4State, Connect4M
     // If empty board, just take the center
     if (state.history.length === 0) return { col: 3 };
 
+    this.clearMemo();
     let bestScore = -Infinity;
     let bestMove = validMoves[0];
     const maximizingPlayer = state.currentPlayer;
+    const opponent = maximizingPlayer === 'Alice' ? 'Bob' : 'Alice';
+    
+    const board = state.board.map(row => [...row]);
+    const order = [3, 2, 4, 1, 5, 0, 6];
 
-    for (const move of validMoves) {
-      const nextState = this.applyMove(state, move);
-      const evalScore = this.minimax(nextState, depthLimit - 1, -Infinity, Infinity, maximizingPlayer);
-      if (evalScore > bestScore) {
-        bestScore = evalScore;
-        bestMove = move;
+    for (const col of order) {
+      if (board[0][col] === null) {
+        const row = this.dropPiece(board, col, maximizingPlayer);
+        const evalScore = this.minimaxInternal(board, depthLimit - 1, -Infinity, Infinity, opponent, maximizingPlayer, depthLimit);
+        this.removePiece(board, row, col);
+
+        if (evalScore > bestScore) {
+          bestScore = evalScore;
+          bestMove = { col };
+        }
       }
     }
     return bestMove;
   }
 
-  public minimax(state: Connect4State, depth: number, alpha: number, beta: number, maximizingPlayer: Player): number {
-    const { winner } = this.checkWin(state.board);
+  public minimaxInternal(
+    board: (Player | null)[][],
+    depth: number,
+    alpha: number,
+    beta: number,
+    currentPlayer: Player,
+    maximizingPlayer: Player,
+    maxDepth: number
+  ): number {
+    const key = this.serialize(board, currentPlayer);
+    if (this.memo.has(key)) return this.memo.get(key)!;
+
+    const { winner } = this.checkWin(board);
     if (winner !== null) {
-      return winner === maximizingPlayer ? 100000 + depth : -100000 - depth;
+      return winner === maximizingPlayer ? 100000 - (maxDepth - depth) : -100000 + (maxDepth - depth);
     }
-    if (state.board[0].every(cell => cell !== null)) {
-      return 0; // Tie
+    
+    let isFull = true;
+    for (let c = 0; c < this.COLS; c++) {
+      if (board[0][c] === null) {
+        isFull = false;
+        break;
+      }
     }
+    if (isFull) return 0; // Tie
+
     if (depth === 0) {
-      return this.evaluateBoard(state.board, maximizingPlayer);
+      return this.evaluateBoard(board, maximizingPlayer);
     }
 
-    const isMaximizing = state.currentPlayer === maximizingPlayer;
-    const validMoves = this.getValidMoves(state);
+    const isMaximizing = currentPlayer === maximizingPlayer;
+    let bestVal = isMaximizing ? -Infinity : Infinity;
+    const order = [3, 2, 4, 1, 5, 0, 6];
+    const opponent = currentPlayer === 'Alice' ? 'Bob' : 'Alice';
 
-    if (isMaximizing) {
-      let maxEval = -Infinity;
-      for (const move of validMoves) {
-        const evalScore = this.minimax(this.applyMove(state, move), depth - 1, alpha, beta, maximizingPlayer);
-        maxEval = Math.max(maxEval, evalScore);
-        alpha = Math.max(alpha, evalScore);
+    for (const col of order) {
+      if (board[0][col] === null) {
+        const row = this.dropPiece(board, col, currentPlayer);
+        const score = this.minimaxInternal(board, depth - 1, alpha, beta, opponent, maximizingPlayer, maxDepth);
+        this.removePiece(board, row, col);
+
+        if (isMaximizing) {
+          bestVal = Math.max(bestVal, score);
+          alpha = Math.max(alpha, score);
+        } else {
+          bestVal = Math.min(bestVal, score);
+          beta = Math.min(beta, score);
+        }
         if (beta <= alpha) break;
       }
-      return maxEval;
-    } else {
-      let minEval = Infinity;
-      for (const move of validMoves) {
-        const evalScore = this.minimax(this.applyMove(state, move), depth - 1, alpha, beta, maximizingPlayer);
-        minEval = Math.min(minEval, evalScore);
-        beta = Math.min(beta, evalScore);
-        if (beta <= alpha) break;
-      }
-      return minEval;
     }
+    
+    this.memo.set(key, bestVal);
+    return bestVal;
   }
 
   private evaluateBoard(board: (Player | null)[][], player: Player): number {
@@ -245,7 +297,7 @@ export class Connect4Engine extends TwoPlayerGameEngine<Connect4State, Connect4M
     }
 
     if (oppCount === 3 && emptyCount === 1) {
-      score -= 80; // block opponent strongly
+      score -= 1000; // block opponent strongly
     } else if (oppCount === 2 && emptyCount === 2) {
       score -= 3;
     }

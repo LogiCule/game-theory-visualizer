@@ -6,7 +6,7 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { getAnalyzerForGame } from '../games/analyzerRegistry';
+import { analysisService } from '../services/analysisService';
 
 export default function Connect4Page() {
   const [gameState, setGameState] = useState<Connect4State | null>(null);
@@ -14,14 +14,27 @@ export default function Connect4Page() {
   const [showPrediction, setShowPrediction] = useState(false);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
   const [lastMove, setLastMove] = useState<{row: number, col: number} | null>(null);
+  const [prediction, setPrediction] = useState<any>(null);
   
   const engine = useMemo(() => new Connect4Engine(), []);
-  const analyzer = useMemo(() => getAnalyzerForGame('connect-4'), []);
 
-  const prediction = useMemo(() => {
-    if (!showPrediction || !gameState || gameState.gameOver || !analyzer) return null;
-    return analyzer.analyze(gameState);
-  }, [showPrediction, gameState, analyzer]);
+  useEffect(() => {
+    if (!showPrediction || !gameState || gameState.gameOver) {
+      setPrediction(null);
+      return;
+    }
+
+    let active = true;
+    analysisService.analyze('connect-4', gameState).then((res: any) => {
+      if (active) {
+        setPrediction(res);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [showPrediction, gameState]);
 
   const startGame = () => {
     setGameState(engine.getInitialState());
