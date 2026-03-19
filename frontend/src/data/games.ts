@@ -36,8 +36,16 @@ export const games: GameMeta[] = [
     id: "nim-game",
     name: "Nim Game",
     description: "Remove stones optimally using XOR strategy.",
-    rules: "There is a single heap of stones on the table. You and your opponent alternate turns. On each turn, a player can remove 1, 2, or 3 stones from the heap. The player who successfully removes the absolute last remaining stone wins the game.",
+    rules: "There is a single pile of stones. Players alternate turns. On each turn, a player can remove exactly 1, 2, or 3 stones from the pile. The player who removes the last stone wins. If you play optimally, it is impossible for your opponent to win from certain configurations.",
     route: "/games/nim",
-    tags: ["Math", "Minimax"]
+    tags: ["Combinatorics", "Modulo", "Zero-Sum", "Heap"]
+  },
+  {
+    id: 'tic-tac-toe',
+    name: 'Tic Tac Toe',
+    description: 'The classic grid-based showdown. Alice is X, Bob is O.',
+    rules: 'Players take turns marking an empty cell in a 3x3 grid (Alice=X, Bob=O). The first player to get 3 marks in a horizontal, vertical, or diagonal row wins. If the board fills completely without a winner, the game is a tie. Playing perfectly guarantees at least a tie.',
+    route: '/games/tic-tac-toe',
+    tags: ['Grid', 'Zero-Sum', 'Solved', 'Classic']
   }
 ];

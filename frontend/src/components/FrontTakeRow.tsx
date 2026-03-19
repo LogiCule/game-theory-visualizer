@@ -5,9 +5,10 @@ interface FrontTakeRowProps {
   maxTake: number;
   gameActive: boolean;
   onTake: (count: number) => void;
+  optimalMove?: number;
 }
 
-export default function FrontTakeRow({ piles, maxTake, gameActive, onTake }: FrontTakeRowProps) {
+export default function FrontTakeRow({ piles, maxTake, gameActive, onTake, optimalMove }: FrontTakeRowProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   if (piles.length === 0) {
@@ -51,6 +52,7 @@ export default function FrontTakeRow({ piles, maxTake, gameActive, onTake }: Fro
               const takes = idx + 1;
               const isSelectable = gameActive && takes <= maxTake;
               const willBeSelected = isSelectable && hoverIndex !== null && hoverIndex >= idx;
+              const isOptimal = optimalMove === takes;
 
               return (
                 <button
@@ -67,11 +69,12 @@ export default function FrontTakeRow({ piles, maxTake, gameActive, onTake }: Fro
                       : 'bg-hextech-dark/50 border border-hextech-border text-hextech-border cursor-not-allowed opacity-60'
                     }
                     ${willBeSelected ? 'ring-2 ring-hextech-blue bg-hextech-blue/10 transform -translate-y-2 !border-hextech-blue' : ''}
+                    ${isOptimal ? 'animate-pulse ring-2 ring-hextech-gold shadow-[0_0_20px_rgba(200,155,60,0.6)] !border-hextech-gold !bg-hextech-gold/10 z-20' : ''}
                   `}
                   style={{ clipPath: 'polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%)' }}
                 >
                   <div className={`absolute inset-0 bg-gradient-to-tr from-hextech-blue/20 to-transparent opacity-0 transition-opacity duration-300 ${isSelectable ? 'group-hover:opacity-100' : ''} ${willBeSelected ? 'opacity-100' : ''}`} />
-                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 ${isSelectable ? 'bg-hextech-blue' : 'bg-hextech-border'}`} />
+                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 ${isSelectable ? 'bg-hextech-blue' : 'bg-hextech-border'} ${isOptimal ? '!bg-hextech-gold' : ''}`} />
                   <span className="relative z-10 drop-shadow-md">{pile}</span>
                 </button>
               );

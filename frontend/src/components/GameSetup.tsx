@@ -1,17 +1,20 @@
 import { Info } from 'lucide-react';
 
 interface GameSetupProps {
+  title?: string;
   description: string;
   rules: string;
-  placeholder: string;
-  inputVal: string;
-  setInputVal: (val: string) => void;
+  placeholder?: string;
+  inputVal?: string;
+  setInputVal?: (val: string) => void;
   gameMode: 'pvp' | 'pve';
   setGameMode: (mode: 'pvp' | 'pve') => void;
   onStart: () => void;
+  hideInput?: boolean;
 }
 
 export default function GameSetup({ 
+  title = "Initialize Match", 
   description, 
   rules,
   placeholder, 
@@ -19,7 +22,8 @@ export default function GameSetup({
   setInputVal, 
   gameMode, 
   setGameMode, 
-  onStart 
+  onStart,
+  hideInput = false
 }: GameSetupProps) {
   return (
     <div className="game-anim bg-hextech-panel/60 backdrop-blur-md border border-hextech-border p-6 md:p-12 max-w-xl mx-auto text-center relative group">
@@ -29,7 +33,7 @@ export default function GameSetup({
 
       <div className="flex justify-center mb-4">
         <div className="relative inline-flex items-center gap-3 group/info">
-          <h2 className="text-2xl font-bold uppercase tracking-widest text-hextech-gold-light m-0 border-b-2 border-transparent">Initialize Match</h2>
+          <h2 className="text-2xl font-bold uppercase tracking-widest text-hextech-gold-light m-0 border-b-2 border-transparent">{title}</h2>
           <div className="relative cursor-help flex items-center justify-center p-1">
             <Info size={22} className="text-hextech-blue hover:text-[#0ac8b9] transition-colors" />
             <div className="absolute left-1/2 -translate-x-1/2 top-[140%] mt-2 w-[280px] sm:w-[350px] p-5 bg-hextech-dark/95 border border-hextech-blue/50 text-hextech-gold-light text-xs sm:text-sm text-left shadow-[0_0_20px_rgba(10,200,185,0.2)] backdrop-blur-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible z-50 rounded-sm leading-relaxed transition-opacity duration-300">
@@ -58,14 +62,19 @@ export default function GameSetup({
         </button>
       </div>
       
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <input 
-          type="text" 
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          placeholder={placeholder}
-          className="px-4 py-3 md:px-6 md:py-4 bg-hextech-dark/80 border border-hextech-border focus:border-hextech-blue text-hextech-gold-light focus:outline-none focus:ring-1 focus:ring-hextech-blue font-mono text-center tracking-widest text-sm md:text-base w-full"
-        />
+      {!hideInput && (
+        <div className="flex flex-col sm:flex-row gap-0 group/input">
+          <input
+            type="text"
+            value={inputVal}
+            onChange={(e) => setInputVal && setInputVal(e.target.value)}
+            className="w-full bg-[#0a0f14] border border-hextech-border/30 text-hextech-gold-light text-center px-4 md:px-6 py-4 outline-none font-mono text-xl sm:text-2xl tracking-[0.3em] transition-all group-hover/input:border-hextech-gold/50 focus:border-hextech-gold shadow-inner"
+            placeholder={placeholder}
+          />
+        </div>
+      )}
+      
+      <div className="flex justify-center gap-4 w-full mt-8">
         <button 
           onClick={onStart}
           className="bg-hextech-blue/20 hover:bg-hextech-blue/30 border border-hextech-blue text-hextech-gold-light font-bold py-3 px-6 md:py-4 md:px-10 transition-all duration-300 shadow-[0_0_15px_rgba(10,200,185,0.2)] hover:shadow-[0_0_25px_rgba(10,200,185,0.4)] cursor-pointer uppercase tracking-widest text-sm relative overflow-hidden group/btn w-full sm:w-auto shrink-0"

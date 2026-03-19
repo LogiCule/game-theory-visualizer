@@ -5,16 +5,26 @@ import FrontTakeRow from '../components/FrontTakeRow';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import { games } from '../data/games';
+import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
+import { getAnalyzerForGame } from '../games/analyzerRegistry';
 
 export default function StoneGame3Page() {
   const [inputVal, setInputVal] = useState('1, 2, 3, 7');
   const [gameState, setGameState] = useState<StoneGame3State | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
+  const [showPrediction, setShowPrediction] = useState(false);
   
   const engine = useMemo(() => new StoneGame3Engine(), []);
+  const analyzer = useMemo(() => getAnalyzerForGame('stone-game-3'), []);
+
+  const prediction = useMemo(() => {
+    if (!showPrediction || !gameState || gameState.gameOver || !analyzer) return null;
+    return analyzer.analyze(gameState);
+  }, [showPrediction, gameState, analyzer]);
 
   const startGame = () => {
     setGameState(engine.getInitialState(inputVal));
+    setShowPrediction(false);
   };
 
   const handleTake = (count: number) => {
@@ -49,7 +59,10 @@ export default function StoneGame3Page() {
         initialConfig: inputVal,
         moves: gameState.history.map(h => h.move)
       } : undefined}
-      onReset={() => setGameState(null)}
+      onReset={() => {
+        setGameState(null);
+        setShowPrediction(false);
+      }}
       setupContent={
         <GameSetup
           description={games.find(g => g.id === 'stone-game-3')?.description || ''}
@@ -64,17 +77,28 @@ export default function StoneGame3Page() {
       }
     >
       {gameState && (
-        <>
-          <div className="text-center mb-6 text-hextech-blue font-bold tracking-widest uppercase text-sm drop-shadow-[0_0_8px_rgba(10,200,185,0.5)]">
-            Max Take: 3 Stones
-          </div>
-          <FrontTakeRow 
-            piles={gameState.piles} 
+        <div className="flex flex-col w-full max-w-4xl mx-auto game-anim">
+          {!gameState.gameOver && (
+            showPrediction ? (
+              <PredictionBanner 
+                winner={prediction?.winner as string} 
+                optimalMove={`Take ${prediction?.optimalMove}`} 
+                scoreDiff={prediction?.scoreDiff} 
+                onClose={() => setShowPrediction(false)}
+              />
+            ) : (
+              <OracleToggle onClick={() => setShowPrediction(true)} />
+            )
+          )}
+
+          <FrontTakeRow
+            piles={gameState.piles}
             maxTake={3}
             gameActive={!gameState.gameOver && !(gameMode === 'pve' && gameState.currentPlayer === 'Bob')}
             onTake={handleTake}
+            optimalMove={showPrediction ? (prediction?.optimalMove as number | undefined) : undefined}
           />
-        </>
+        </div>
       )}
     </GameLayout>
   );

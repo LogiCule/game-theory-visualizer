@@ -2,6 +2,7 @@ import { StoneGameEngine } from './StoneGameEngine';
 import { StoneGame2Engine } from './StoneGame2Engine';
 import { StoneGame3Engine } from './StoneGame3Engine';
 import { NimGameEngine } from './NimGameEngine';
+import { TicTacToeEngine } from './TicTacToeEngine';
 import { TwoPlayerGameEngine } from './core/TwoPlayerGameEngine';
 
 export function getEngineForGame(gameId: string): TwoPlayerGameEngine<any, any, any> | null {
@@ -14,6 +15,8 @@ export function getEngineForGame(gameId: string): TwoPlayerGameEngine<any, any, 
       return new StoneGame3Engine();
     case 'nim-game':
       return new NimGameEngine();
+    case 'tic-tac-toe':
+      return new TicTacToeEngine();
     default:
       return null;
   }
