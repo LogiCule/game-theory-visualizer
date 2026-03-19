@@ -32,10 +32,10 @@ export default function GameSetup({
           <h2 className="text-2xl font-bold uppercase tracking-widest text-hextech-gold-light m-0 border-b-2 border-transparent">Initialize Match</h2>
           <div className="relative cursor-help flex items-center justify-center p-1">
             <Info size={22} className="text-hextech-blue hover:text-[#0ac8b9] transition-colors" />
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-[140%] mb-2 w-[280px] sm:w-[350px] p-5 bg-hextech-dark/95 border border-hextech-blue/50 text-hextech-gold-light text-xs sm:text-sm text-left shadow-[0_0_20px_rgba(10,200,185,0.2)] backdrop-blur-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-300 pointer-events-none z-50 rounded-sm leading-relaxed">
+            <div className="absolute left-1/2 -translate-x-1/2 top-[140%] mt-2 w-[280px] sm:w-[350px] p-5 bg-hextech-dark/95 border border-hextech-blue/50 text-hextech-gold-light text-xs sm:text-sm text-left shadow-[0_0_20px_rgba(10,200,185,0.2)] backdrop-blur-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible z-50 rounded-sm leading-relaxed transition-opacity duration-300">
               <div className="font-bold text-hextech-blue uppercase tracking-widest mb-3 text-xs w-full border-b border-hextech-blue/30 pb-2">Game Rules</div>
               <div className="text-hextech-gold/90">{rules}</div>
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-hextech-blue/50 w-0 h-0" />
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-hextech-blue/50 w-0 h-0" />
             </div>
           </div>
         </div>

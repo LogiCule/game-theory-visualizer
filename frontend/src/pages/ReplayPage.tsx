@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { getEngineForGame } from '../games/engineRegistry';
 import GameLayout from '../components/GameLayout';
 import PileRow from '../components/PileRow';
@@ -168,10 +168,23 @@ export default function ReplayPage() {
           </button>
 
           <button 
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => {
+              if (currentStep === states.length - 1) {
+                setCurrentStep(0);
+                setIsPlaying(true);
+              } else {
+                setIsPlaying(!isPlaying);
+              }
+            }}
             className="w-14 h-14 flex items-center justify-center bg-hextech-blue/10 border border-hextech-blue text-hextech-blue hover:bg-hextech-blue/20 transition-all rounded-full shadow-[0_0_15px_rgba(10,200,185,0.2)] hover:shadow-[0_0_25px_rgba(10,200,185,0.4)] hover:scale-105 cursor-pointer"
           >
-            {isPlaying ? <Pause size={24} /> : <Play size={24} className="ml-1" />}
+            {currentStep === states.length - 1 ? (
+               <RotateCcw size={24} />
+            ) : isPlaying ? (
+               <Pause size={24} />
+            ) : (
+               <Play size={24} className="ml-1" />
+            )}
           </button>
 
           <button 
