@@ -35,7 +35,7 @@ export const games: GameMeta[] = [
   {
     id: "nim-game",
     name: "Nim Game",
-    description: "Remove stones optimally using XOR strategy.",
+    description: "Remove stones wisely and control the game state. Behind the scenes lies a simple pattern that determines who will win—if you can spot it.",
     rules: "There is a single pile of stones. Players alternate turns. On each turn, a player can remove exactly 1, 2, or 3 stones from the pile. The player who removes the last stone wins. If you play optimally, it is impossible for your opponent to win from certain configurations.",
     route: "/games/nim",
     tags: ["Combinatorics", "Modulo", "Zero-Sum", "Heap"]
@@ -46,6 +46,14 @@ export const games: GameMeta[] = [
     description: 'The classic grid-based showdown. Alice is X, Bob is O.',
     rules: 'Players take turns marking an empty cell in a 3x3 grid (Alice=X, Bob=O). The first player to get 3 marks in a horizontal, vertical, or diagonal row wins. If the board fills completely without a winner, the game is a tie. Playing perfectly guarantees at least a tie.',
     route: '/games/tic-tac-toe',
+    tags: ['Grid', 'Zero-Sum', 'Solved', 'Classic']
+  },
+  {
+    id: 'connect-4',
+    name: 'Connect 4',
+    description: 'The ultimate vertical grid showdown. Drop your pieces strategically.',
+    rules: 'Players drop their designated pieces (Alice=Gold, Bob=Blue) into any of the 7 columns. The piece falls straight down, occupying the lowest available space in that column. The first player to form a chain of 4 contiguous pieces vertically, horizontally, or diagonally wins the match!',
+    route: '/games/connect-4',
     tags: ['Grid', 'Zero-Sum', 'Solved', 'Classic']
   }
 ];

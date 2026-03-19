@@ -5,6 +5,7 @@ import StoneGame2Page from '../pages/StoneGame2Page';
 import StoneGame3Page from '../pages/StoneGame3Page';
 import NimGamePage from '../pages/NimGamePage';
 import TicTacToePage from '../pages/TicTacToePage';
+import Connect4Page from '../pages/Connect4Page';
 import ReplayPage from '../pages/ReplayPage';
 
 export default function AppRouter() {
@@ -17,6 +18,7 @@ export default function AppRouter() {
         <Route path="/games/stone-game-3" element={<StoneGame3Page />} />
         <Route path="/games/nim" element={<NimGamePage />} />
         <Route path="/games/tic-tac-toe" element={<TicTacToePage />} />
+        <Route path="/games/connect-4" element={<Connect4Page />} />
         <Route path="/replay" element={<ReplayPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
