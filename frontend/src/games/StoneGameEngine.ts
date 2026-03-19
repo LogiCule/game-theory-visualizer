@@ -1,13 +1,13 @@
 import { TwoPlayerGameEngine } from './core/TwoPlayerGameEngine';
-import type { BaseGameState } from './core/TwoPlayerGameEngine';
-
-export interface StoneGameState extends BaseGameState {
-  piles: number[];
-}
+import type { BaseGameState, Player } from './core/TwoPlayerGameEngine';
 
 export type StoneGameMove = 'left' | 'right';
 
-export class StoneGameEngine extends TwoPlayerGameEngine<StoneGameState, StoneGameMove> {
+export interface StoneGameState extends BaseGameState<StoneGameMove> {
+  piles: number[];
+}
+
+export class StoneGameEngine extends TwoPlayerGameEngine<StoneGameState, StoneGameMove, string> {
   
   public getInitialState(input: string): StoneGameState {
     let piles: number[] = [];
@@ -25,13 +25,30 @@ export class StoneGameEngine extends TwoPlayerGameEngine<StoneGameState, StoneGa
     };
   }
 
-  public isValidMove(state: StoneGameState, _move: StoneGameMove): boolean {
-    if (state.gameOver || state.piles.length === 0) return false;
-    return true; 
+  public isTerminal(state: StoneGameState): boolean {
+    return state.piles.length === 0;
+}
+
+  public getValidMoves(state: StoneGameState): StoneGameMove[] {
+  if (this.isTerminal(state)) return [];
+  if (state.piles.length === 1) return ['left'];
+  return ['left', 'right'];
+}
+
+  public getResult(state: StoneGameState): Player | "Tie" | null {
+    if (!this.isTerminal(state) && !state.gameOver) return null;
+    if (state.scores.Alice > state.scores.Bob) return "Alice";
+    if (state.scores.Bob > state.scores.Alice) return "Bob";
+    return "Tie";
   }
 
+  public isValidMove(state: StoneGameState, move: StoneGameMove): boolean {
+  if (this.isTerminal(state)) return false;
+  return move === 'left' || move === 'right';
+}
+
   public applyMove(state: StoneGameState, move: StoneGameMove): StoneGameState {
-    if (!this.isValidMove(state, move)) return state;
+    if (!this.isValidMove(state, move)) throw new Error("Invalid move");
 
     const newPiles = [...state.piles];
     let pickedValue = 0;
@@ -45,7 +62,7 @@ export class StoneGameEngine extends TwoPlayerGameEngine<StoneGameState, StoneGa
     const newScores = { ...state.scores };
     newScores[state.currentPlayer] += pickedValue;
 
-    const newHistory = [...state.history, this.createHistoryEntry(state.currentPlayer, `picked ${move.toUpperCase()} (${pickedValue})`)];
+    const newHistory = [...state.history, this.createHistoryEntry(state.currentPlayer, move, `picked ${move.toUpperCase()} (${pickedValue})`)];
 
     return {
       piles: newPiles,

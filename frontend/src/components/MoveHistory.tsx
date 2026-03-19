@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
+import type { HistoryEntry } from '../games/core/TwoPlayerGameEngine';
 
 interface MoveHistoryProps {
-  history: string[];
+  history: HistoryEntry<any>[];
 }
 
 export default function MoveHistory({ history }: MoveHistoryProps) {
@@ -31,8 +32,8 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
           <div className="text-hextech-border text-center mt-4 uppercase tracking-widest text-xs">Awaiting first move</div>
         ) : (
           <ul className="space-y-4">
-            {history.map((move, index) => {
-              const isAlice = move.startsWith('Alice');
+            {history.map((entry, index) => {
+              const isAlice = entry.player === 'Alice';
               const colorClass = isAlice ? 'bg-[#c89b3c]/10 text-[#c89b3c] border-[#c89b3c]/30' : 'bg-[#0ac8b9]/10 text-[#0ac8b9] border-[#0ac8b9]/30';
               return (
                 <li key={index} className="flex items-start game-anim">
@@ -42,7 +43,7 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
                   `}>
                     {index + 1}
                   </span>
-                  <span className="text-hextech-gold-light/80 text-sm font-mono tracking-tight">{move}</span>
+                  <span className="text-hextech-gold-light/80 text-sm font-mono tracking-tight">{entry.description}</span>
                 </li>
               );
             })}

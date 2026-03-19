@@ -15,10 +15,16 @@ interface GameLayoutProps {
   
   // Game state props
   scores?: { Alice: number; Bob: number };
+  showScore?: boolean;
   currentPlayer?: 'Alice' | 'Bob';
   gameOver?: boolean;
-  winner?: 'Alice' | 'Bob' | 'Draw' | null;
-  history?: string[];
+  winner?: 'Alice' | 'Bob' | 'Draw' | 'Tie' | null;
+  history?: import('../games/core/TwoPlayerGameEngine').HistoryEntry<any>[];
+  replayData?: {
+    gameId: string;
+    initialConfig: string;
+    moves: any[];
+  };
   
   // Actions
   onReset?: () => void;
@@ -32,10 +38,12 @@ export default function GameLayout({
   isGameActive,
   setupContent,
   scores,
+  showScore = true,
   currentPlayer,
   gameOver,
   winner,
   history,
+  replayData,
   onReset,
   children
 }: GameLayoutProps) {
@@ -81,7 +89,7 @@ export default function GameLayout({
               
               {scores && (
                 <div className="game-anim w-full">
-                  <ScoreBoard aliceScore={scores.Alice} bobScore={scores.Bob} />
+                  <ScoreBoard aliceScore={scores.Alice} bobScore={scores.Bob} showScore={showScore} />
                 </div>
               )}
               
@@ -99,16 +107,30 @@ export default function GameLayout({
                 {children}
               </div>
 
-              {gameOver && onReset && (
-                <div className="game-anim flex justify-center mt-6 w-full">
-                  <button 
-                    onClick={onReset}
-                    className="flex items-center justify-center bg-hextech-dark border border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-[#c89b3c]/20 font-bold py-4 px-10 transition-all duration-300 shadow-[0_0_20px_rgba(200,155,60,0.15)] hover:shadow-[0_0_30px_rgba(200,155,60,0.3)] cursor-pointer uppercase tracking-widest relative overflow-hidden group/btn w-full max-w-sm"
-                  >
-                    <div className="absolute inset-0 bg-hextech-gold/10 transform -translate-x-full skew-x-12 group-hover/btn:animate-[shine_1s_ease-out_forwards]" />
-                    <RefreshCw className="mr-3" size={18} />
-                    Deploy Again
-                  </button>
+              {gameOver && (onReset || replayData) && (
+                <div className="game-anim flex flex-col md:flex-row justify-center gap-4 mt-6 w-full">
+                  {onReset && (
+                    <button 
+                      onClick={onReset}
+                      className="flex items-center justify-center bg-hextech-dark border border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-[#c89b3c]/20 font-bold py-4 px-8 transition-all duration-300 shadow-[0_0_15px_rgba(200,155,60,0.15)] hover:shadow-[0_0_25px_rgba(200,155,60,0.3)] cursor-pointer uppercase tracking-widest relative overflow-hidden group/btn w-full md:w-auto min-w-[200px]"
+                    >
+                      <div className="absolute inset-0 bg-hextech-gold/10 transform -translate-x-full skew-x-12 group-hover/btn:animate-[shine_1s_ease-out_forwards]" />
+                      <RefreshCw className="mr-3" size={18} />
+                      Deploy Again
+                    </button>
+                  )}
+                  {replayData && (
+                    <button 
+                      onClick={() => navigate('/replay', { state: replayData })}
+                      className="flex items-center justify-center bg-hextech-blue/10 border border-hextech-blue text-hextech-blue hover:text-[#0ac8b9] hover:bg-hextech-blue/20 font-bold py-4 px-8 transition-all duration-300 shadow-[0_0_15px_rgba(10,200,185,0.15)] hover:shadow-[0_0_25px_rgba(10,200,185,0.3)] cursor-pointer uppercase tracking-widest relative overflow-hidden group/btn w-full md:w-auto min-w-[200px]"
+                    >
+                      <div className="absolute inset-0 bg-hextech-blue/10 transform -translate-x-full skew-x-12 group-hover/btn:animate-[shine_1s_ease-out_forwards]" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 filter drop-shadow-md">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      Watch Replay
+                    </button>
+                  )}
                 </div>
               )}
             </div>

@@ -1,5 +1,8 @@
+import { Info } from 'lucide-react';
+
 interface GameSetupProps {
   description: string;
+  rules: string;
   placeholder: string;
   inputVal: string;
   setInputVal: (val: string) => void;
@@ -10,6 +13,7 @@ interface GameSetupProps {
 
 export default function GameSetup({ 
   description, 
+  rules,
   placeholder, 
   inputVal, 
   setInputVal, 
@@ -18,13 +22,26 @@ export default function GameSetup({
   onStart 
 }: GameSetupProps) {
   return (
-    <div className="game-anim bg-hextech-panel/60 backdrop-blur-md border border-hextech-border p-6 md:p-12 max-w-xl mx-auto text-center relative overflow-hidden group">
+    <div className="game-anim bg-hextech-panel/60 backdrop-blur-md border border-hextech-border p-6 md:p-12 max-w-xl mx-auto text-center relative group">
       <div className="absolute top-0 left-0 w-0 h-1 bg-hextech-blue transition-all duration-700 group-hover:w-full" />
       <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-hextech-gold opacity-50 m-2" />
       <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-hextech-gold opacity-50 m-2" />
 
-      <h2 className="text-2xl font-bold mb-4 uppercase tracking-widest text-hextech-gold-light">Initialize Match</h2>
-      <p className="text-gray-400 mb-8 font-light tracking-wide text-sm">{description}</p>
+      <div className="flex justify-center mb-4">
+        <div className="relative inline-flex items-center gap-3 group/info">
+          <h2 className="text-2xl font-bold uppercase tracking-widest text-hextech-gold-light m-0 border-b-2 border-transparent">Initialize Match</h2>
+          <div className="relative cursor-help flex items-center justify-center p-1">
+            <Info size={22} className="text-hextech-blue hover:text-[#0ac8b9] transition-colors" />
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-[140%] mb-2 w-[280px] sm:w-[350px] p-5 bg-hextech-dark/95 border border-hextech-blue/50 text-hextech-gold-light text-xs sm:text-sm text-left shadow-[0_0_20px_rgba(10,200,185,0.2)] backdrop-blur-xl opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-300 pointer-events-none z-50 rounded-sm leading-relaxed">
+              <div className="font-bold text-hextech-blue uppercase tracking-widest mb-3 text-xs w-full border-b border-hextech-blue/30 pb-2">Game Rules</div>
+              <div className="text-hextech-gold/90">{rules}</div>
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-hextech-blue/50 w-0 h-0" />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <p className="text-gray-400 mb-8 font-light tracking-wide text-sm max-w-md mx-auto">{description}</p>
       
       <div className="flex justify-center gap-4 mb-8">
         <button 

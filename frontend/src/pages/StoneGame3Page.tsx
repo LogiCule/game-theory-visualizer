@@ -4,6 +4,7 @@ import type { StoneGame3State } from '../games/StoneGame3Engine';
 import FrontTakeRow from '../components/FrontTakeRow';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
+import { games } from '../data/games';
 
 export default function StoneGame3Page() {
   const [inputVal, setInputVal] = useState('1, 2, 3, 7');
@@ -41,12 +42,18 @@ export default function StoneGame3Page() {
       scores={gameState?.scores}
       currentPlayer={gameState?.currentPlayer}
       gameOver={gameState?.gameOver}
-      winner={gameState ? (engine.getWinner(gameState) as 'Alice' | 'Bob' | 'Draw' | null) : null}
+      winner={gameState ? engine.getResult(gameState) : null}
       history={gameState?.history}
+      replayData={gameState?.gameOver ? {
+        gameId: 'stone-game-3',
+        initialConfig: inputVal,
+        moves: gameState.history.map(h => h.move)
+      } : undefined}
       onReset={() => setGameState(null)}
       setupContent={
         <GameSetup
-          description="Deploy the initial sequence of stones."
+          description={games.find(g => g.id === 'stone-game-3')?.description || ''}
+          rules={games.find(g => g.id === 'stone-game-3')?.rules || ''}
           placeholder="1, 2, 3, 7"
           inputVal={inputVal}
           setInputVal={setInputVal}

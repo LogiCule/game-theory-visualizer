@@ -3,6 +3,8 @@ import HomePage from '../pages/HomePage';
 import StoneGamePage from '../pages/StoneGamePage';
 import StoneGame2Page from '../pages/StoneGame2Page';
 import StoneGame3Page from '../pages/StoneGame3Page';
+import NimGamePage from '../pages/NimGamePage';
+import ReplayPage from '../pages/ReplayPage';
 
 export default function AppRouter() {
   return (
@@ -12,6 +14,8 @@ export default function AppRouter() {
         <Route path="/games/stone-game" element={<StoneGamePage />} />
         <Route path="/games/stone-game-2" element={<StoneGame2Page />} />
         <Route path="/games/stone-game-3" element={<StoneGame3Page />} />
+        <Route path="/games/nim" element={<NimGamePage />} />
+        <Route path="/replay" element={<ReplayPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

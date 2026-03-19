@@ -4,6 +4,7 @@ import type { StoneGameState } from '../games/StoneGameEngine';
 import PileRow from '../components/PileRow';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
+import { games } from '../data/games';
 
 export default function StoneGamePage() {
   const [inputVal, setInputVal] = useState('5, 3, 4, 5');
@@ -47,12 +48,18 @@ export default function StoneGamePage() {
       scores={gameState?.scores}
       currentPlayer={gameState?.currentPlayer}
       gameOver={gameState?.gameOver}
-      winner={gameState ? (engine.getWinner(gameState) as 'Alice' | 'Bob' | 'Draw' | null) : null}
+      winner={gameState ? engine.getResult(gameState) : null}
       history={gameState?.history}
+      replayData={gameState?.gameOver ? {
+        gameId: 'stone-game-1',
+        initialConfig: inputVal,
+        moves: gameState.history.map(h => h.move)
+      } : undefined}
       onReset={() => setGameState(null)}
       setupContent={
         <GameSetup
-          description="Deploy the initial sequence of stones, delineated by commas."
+          description={games.find(g => g.id === 'stone-game-1')?.description || ''}
+          rules={games.find(g => g.id === 'stone-game-1')?.rules || ''}
           placeholder="e.g. 5, 3, 4, 5"
           inputVal={inputVal}
           setInputVal={setInputVal}
