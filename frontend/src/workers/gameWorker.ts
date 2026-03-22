@@ -1,5 +1,6 @@
 import { getAnalyzerForGame } from '../games/analyzerRegistry';
 import { getEngineForGame } from '../games/engineRegistry';
+import { TreeBuilder } from './TreeBuilder';
 
 self.onmessage = async (event) => {
   const { requestId, gameId, state, type } = event.data;
@@ -36,5 +37,14 @@ self.onmessage = async (event) => {
        result = engine.getOptimalMove(state);
        self.postMessage({ requestId, result, type });
     }
+  } else if (type === 'tree') {
+    const engine = getEngineForGame(gameId);
+    if (!engine) {
+      self.postMessage({ requestId, result: null, type });
+      return;
+    }
+    const depth = event.data.depth || 2;
+    result = TreeBuilder.build(engine, state, depth);
+    self.postMessage({ requestId, result, type });
   }
 };
