@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { TicTacToeEngine } from '../games/TicTacToeEngine';
+import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { TicTacToeState } from '../games/TicTacToeEngine';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
@@ -40,7 +41,7 @@ export default function TicTacToePage() {
 
   const handleCellClick = (r: number, c: number) => {
     if (gameState && !gameState.gameOver && engine.isValidMove(gameState, { row: r, col: c })) {
-      setGameState(engine.applyMove(gameState, { row: r, col: c }));
+      setGameState(applyMoveWithExplanation(engine, gameState, { row: r, col: c }, 'tic-tac-toe', prediction || undefined));
     }
   };
 
@@ -50,7 +51,7 @@ export default function TicTacToePage() {
       const timer = setTimeout(() => {
         analysisService.getBestMove('tic-tac-toe', gameState).then(move => {
           if (active && move) {
-            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'tic-tac-toe', prediction || undefined) : null);
           }
         });
       }, 500); 

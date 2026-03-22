@@ -1,9 +1,10 @@
 export type Player = 'Alice' | 'Bob';
-
+import type { MoveExplanation } from './GameExplainer';
 export type HistoryEntry<TMove> = {
   player: Player;
   move: TMove;
   description: string;
+  explanation?: MoveExplanation;
 };
 
 export interface BaseGameState<TMove> {

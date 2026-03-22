@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Connect4Engine } from '../games/Connect4Engine';
+import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { Connect4State } from '../games/Connect4Engine';
 import type { Player } from '../games/core/TwoPlayerGameEngine';
 import GameLayout from '../components/GameLayout';
@@ -54,7 +55,7 @@ export default function Connect4Page() {
   const handleCellClick = (c: number) => {
     if (gameState && !gameState.gameOver && engine.isValidMove(gameState, { col: c })) {
       const targetRow = getTargetRow(gameState.board, c);
-      setGameState(engine.applyMove(gameState, { col: c }));
+      setGameState(applyMoveWithExplanation(engine, gameState, { col: c }, 'connect-4', prediction || undefined));
       setLastMove({ row: targetRow, col: c });
     }
   };
@@ -70,7 +71,7 @@ export default function Connect4Page() {
           if (active && move) {
             setHint(null);
             const targetRow = getTargetRow(gameState.board, move.col);
-            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'connect-4', prediction || undefined) : null);
             setLastMove({ row: targetRow, col: move.col });
           }
         });

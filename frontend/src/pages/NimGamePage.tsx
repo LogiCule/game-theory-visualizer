@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { NimGameEngine } from '../games/NimGameEngine';
+import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { NimState } from '../games/NimGameEngine';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
@@ -41,7 +42,7 @@ export default function NimGamePage() {
 
   const handleTake = (count: 1 | 2 | 3) => {
     if (gameState && !gameState.gameOver && engine.isValidMove(gameState, count)) {
-      setGameState(engine.applyMove(gameState, count));
+      setGameState(applyMoveWithExplanation(engine, gameState, count, 'nim-game', prediction || undefined));
     }
   };
 
@@ -51,7 +52,7 @@ export default function NimGamePage() {
       const timer = setTimeout(() => {
         analysisService.getBestMove('nim-game', gameState).then(move => {
           if (active && move !== null) {
-            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'nim-game', prediction || undefined) : null);
           }
         });
       }, 1000);

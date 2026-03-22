@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { StoneGame2Engine } from '../games/StoneGame2Engine';
+import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { StoneGame2State } from '../games/StoneGame2Engine';
 import FrontTakeRow from '../components/FrontTakeRow';
 import GameLayout from '../components/GameLayout';
@@ -42,7 +43,7 @@ export default function StoneGame2Page() {
 
   const handleTake = (count: number) => {
     if (gameState && !gameState.gameOver) {
-      setGameState(engine.applyMove(gameState, count));
+      setGameState(applyMoveWithExplanation(engine, gameState, count, 'stone-game-2', prediction || undefined));
     }
   };
 
@@ -52,7 +53,7 @@ export default function StoneGame2Page() {
       const timer = setTimeout(() => {
         analysisService.getBestMove('stone-game-2', gameState).then(move => {
           if (active && move !== null) {
-            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'stone-game-2', prediction || undefined) : null);
           }
         });
       }, 1000);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { StoneGameEngine } from '../games/StoneGameEngine';
+import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { StoneGameState } from '../games/StoneGameEngine';
 import PileRow from '../components/PileRow';
 import GameLayout from '../components/GameLayout';
@@ -42,13 +43,13 @@ export default function StoneGamePage() {
 
   const handleTakeLeft = () => {
     if (gameState && !gameState.gameOver) {
-      setGameState(engine.applyMove(gameState, 'left'));
+      setGameState(applyMoveWithExplanation(engine, gameState, 'left', 'stone-game-1', prediction || undefined));
     }
   };
 
   const handleTakeRight = () => {
     if (gameState && !gameState.gameOver) {
-      setGameState(engine.applyMove(gameState, 'right'));
+      setGameState(applyMoveWithExplanation(engine, gameState, 'right', 'stone-game-1', prediction || undefined));
     }
   };
 
@@ -58,7 +59,7 @@ export default function StoneGamePage() {
       const timer = setTimeout(() => {
         analysisService.getBestMove('stone-game-1', gameState).then(move => {
           if (active && move) {
-            setGameState(prev => prev ? engine.applyMove(prev, move) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'stone-game-1', prediction || undefined) : null);
           }
         });
       }, 1000);

@@ -43,7 +43,32 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
                   `}>
                     {index + 1}
                   </span>
-                  <span className="text-hextech-gold-light/80 text-sm font-mono tracking-tight">{entry.description}</span>
+                  <div className="flex flex-col flex-1">
+                    <span className="text-hextech-gold-light/80 text-sm font-mono tracking-tight flex items-center flex-wrap gap-2">
+                      <span>{entry.explanation ? entry.explanation.summary : entry.description}</span>
+                      {entry.explanation && entry.explanation.impact && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded border uppercase tracking-wider font-bold ${
+                          entry.explanation.impact === 'strong' ? 'bg-[#0ac8b9]/10 text-[#0ac8b9] border-[#0ac8b9]/30' :
+                          entry.explanation.impact === 'weak' ? 'bg-[#c83c3c]/10 text-[#c83c3c] border-[#c83c3c]/30' :
+                          'bg-hextech-gold/10 text-hextech-gold border-hextech-gold/30'
+                        }`}>
+                          {entry.explanation.impact}
+                        </span>
+                      )}
+                      {entry.explanation && entry.explanation.scoreImpact !== undefined && (
+                        <span className={`text-xs font-bold ${entry.explanation.scoreImpact > 0 ? 'text-[#0ac8b9]' : entry.explanation.scoreImpact < 0 ? 'text-[#c83c3c]' : 'text-hextech-gold'}`}>
+                          ({entry.explanation.scoreImpact > 0 ? '+' : ''}{entry.explanation.scoreImpact})
+                        </span>
+                      )}
+                    </span>
+                    {entry.explanation && entry.explanation.reasons.length > 0 && (
+                      <ul className="mt-1 ml-4 list-disc list-outside text-xs text-hextech-gold-light/60 space-y-0.5">
+                        {entry.explanation.reasons.map((r, i) => (
+                          <li key={i}>{r}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </li>
               );
             })}
