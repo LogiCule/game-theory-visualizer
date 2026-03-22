@@ -14,11 +14,7 @@ export class AnalysisService {
     return this.sendRequest('bestMove', gameId, state, onProgress);
   }
 
-  getTree(gameId: string, state: any, depth = 2): Promise<any> {
-    return this.sendRequest('tree', gameId, state, undefined, { depth });
-  }
-
-  private sendRequest(type: string, gameId: string, state: any, onProgress?: (data: any) => void, extraParams?: any): Promise<any> {
+  private sendRequest(type: string, gameId: string, state: any, onProgress?: (data: any) => void): Promise<any> {
     return new Promise((resolve) => {
       const requestId = ++this.currentRequestId;
 
@@ -42,8 +38,7 @@ export class AnalysisService {
         requestId,
         type,
         gameId,
-        state,
-        ...extraParams
+        state
       });
     });
   }

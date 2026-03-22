@@ -5,8 +5,6 @@ import PileRow from '../components/PileRow';
 import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
-import TreeCanvas from '../components/TreeCanvas';
-import type { TreeNode } from '../types/tree';
 import { games } from '../data/games';
 import { analysisService } from '../services/analysisService';
 
@@ -16,9 +14,6 @@ export default function StoneGamePage() {
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
-  const [tree, setTree] = useState<TreeNode | null>(null);
-  const [isTreeOpen, setIsTreeOpen] = useState(false);
-  const [isComputingTree, setIsComputingTree] = useState(false);
   
   const engine = useMemo(() => new StoneGameEngine(), []);
 
@@ -43,8 +38,6 @@ export default function StoneGamePage() {
   const startGame = () => {
     setGameState(engine.getInitialState(inputVal));
     setShowPrediction(false);
-    setTree(null);
-    setIsTreeOpen(false);
   };
 
   const handleTakeLeft = () => {
@@ -56,41 +49,6 @@ export default function StoneGamePage() {
   const handleTakeRight = () => {
     if (gameState && !gameState.gameOver) {
       setGameState(engine.applyMove(gameState, 'right'));
-    }
-  };
-
-  useEffect(() => {
-    if (isTreeOpen && gameState && !gameState.gameOver) {
-      let active = true;
-      setIsComputingTree(true);
-      analysisService.getTree('stone-game-1', gameState, 3)
-        .then(treeData => {
-          if (active) {
-            setTree(treeData);
-            setIsComputingTree(false);
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          if (active) setIsComputingTree(false);
-        });
-
-      return () => {
-        active = false;
-        setIsComputingTree(false);
-      };
-    } else if (gameState?.gameOver) {
-      setTree(null);
-      setIsTreeOpen(false);
-    }
-  }, [gameState, isTreeOpen]);
-
-  const handleToggleTree = () => {
-    if (isTreeOpen) {
-      setIsTreeOpen(false);
-      setTree(null);
-    } else {
-      setIsTreeOpen(true);
     }
   };
 
@@ -128,8 +86,6 @@ export default function StoneGamePage() {
       onReset={() => {
         setGameState(null);
         setShowPrediction(false);
-        setTree(null);
-        setIsTreeOpen(false);
       }}
       setupContent={
         <GameSetup
@@ -167,24 +123,6 @@ export default function StoneGamePage() {
             highlightLeft={showPrediction && prediction?.optimalMove === 'left'}
             highlightRight={showPrediction && prediction?.optimalMove === 'right'}
           />
-
-          {!gameState.gameOver && (
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={handleToggleTree}
-                disabled={isComputingTree && !tree}
-                className="flex items-center justify-center bg-hextech-panel border border-hextech-gold text-hextech-gold hover:text-hextech-gold-light hover:bg-[#c89b3c]/20 font-bold py-2 px-6 transition-all duration-300 shadow-[0_0_10px_rgba(200,155,60,0.15)] hover:shadow-[0_0_20px_rgba(200,155,60,0.3)] cursor-pointer uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
-              >
-                {isComputingTree ? 'Computing...' : (isTreeOpen ? 'Hide Tree' : 'Show Tree')}
-              </button>
-            </div>
-          )}
-
-          {tree && (
-            <div className="mt-8 border-t border-slate-700 pt-6">
-              <TreeCanvas tree={tree} width={800} height={400} />
-            </div>
-          )}
         </div>
       )}
     </GameLayout>

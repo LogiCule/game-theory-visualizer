@@ -27,11 +27,7 @@ export class StoneGameEngine extends TwoPlayerGameEngine<StoneGameState, StoneGa
 
   public isTerminal(state: StoneGameState): boolean {
     return state.piles.length === 0;
-  }
-
-  public evaluate(state: StoneGameState): number {
-    return state.scores.Alice - state.scores.Bob;
-  }
+}
 
   public getValidMoves(state: StoneGameState): StoneGameMove[] {
   if (this.isTerminal(state)) return [];
