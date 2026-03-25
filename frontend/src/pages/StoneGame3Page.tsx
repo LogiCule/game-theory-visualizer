@@ -4,6 +4,7 @@ import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { StoneGame3State } from '../games/StoneGame3Engine';
 import FrontTakeRow from '../components/FrontTakeRow';
 import GameLayout from '../components/GameLayout';
+import GameContentGrid from '../components/GameContentGrid';
 import GameSetup from '../components/GameSetup';
 import { games } from '../data/games';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
@@ -17,25 +18,14 @@ export default function StoneGame3Page() {
   const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
-  
+
   const engine = useMemo(() => new StoneGame3Engine(), []);
 
   useEffect(() => {
-    if (!showPrediction || !gameState || gameState.gameOver) {
-      setPrediction(null);
-      return;
-    }
-
+    if (!showPrediction || !gameState || gameState.gameOver) { setPrediction(null); return; }
     let active = true;
-    analysisService.analyze('stone-game-3', gameState, difficulty).then((res: any) => {
-      if (active) {
-        setPrediction(res);
-      }
-    });
-
-    return () => {
-      active = false;
-    };
+    analysisService.analyze('stone-game-3', gameState, difficulty).then((res: any) => { if (active) setPrediction(res); });
+    return () => { active = false; };
   }, [showPrediction, gameState]);
 
   const startGame = () => {
@@ -60,34 +50,33 @@ export default function StoneGame3Page() {
           }
         });
       }, 1000);
-      return () => {
-        active = false;
-        clearTimeout(timer);
-      };
+      return () => { active = false; clearTimeout(timer); };
     }
   }, [gameState, gameMode, engine]);
 
+  const board = gameState && (
+    <div className="w-full max-w-[600px] mx-auto">
+      <FrontTakeRow
+        piles={gameState.piles}
+        maxTake={3}
+        gameActive={!gameState.gameOver && !(gameMode === 'pve' && gameState.currentPlayer === 'Bob')}
+        onTake={handleTake}
+        optimalMove={showPrediction ? (prediction?.optimalMove as number | undefined) : undefined}
+      />
+    </div>
+  );
+
+  const boardControls = gameState && !gameState.gameOver && (
+    showPrediction ? (
+      <PredictionBanner winner={prediction?.winner as string} optimalMove={`Take ${prediction?.optimalMove}`} scoreDiff={prediction?.scoreDiff} onClose={() => setShowPrediction(false)} />
+    ) : (
+      <OracleToggle onClick={() => setShowPrediction(true)} />
+    )
+  );
+
   return (
-    <GameLayout
-      title="Stone Game III"
-      isGameActive={gameState !== null}
-      scores={gameState?.scores}
-      currentPlayer={gameState?.currentPlayer}
-      gameOver={gameState?.gameOver}
-      winner={gameState ? engine.getResult(gameState) : null}
-      history={gameState?.history}
-      replayData={gameState?.gameOver ? {
-        gameId: 'stone-game-3',
-        initialConfig: inputVal,
-        moves: gameState.history.map(h => h.move)
-      } : undefined}
-      gameMode={gameMode}
-      difficulty={difficulty}
-      onReset={() => {
-        setGameState(null);
-        setShowPrediction(false);
-      }}
-      setupContent={
+    <GameLayout title="Stone Game III">
+      {!gameState ? (
         <GameSetup
           description={games.find(g => g.id === 'stone-game-3')?.description || ''}
           rules={games.find(g => g.id === 'stone-game-3')?.rules || ''}
@@ -100,31 +89,24 @@ export default function StoneGame3Page() {
           setDifficulty={setDifficulty}
           onStart={startGame}
         />
-      }
-    >
-      {gameState && (
-        <div className="flex flex-col w-full max-w-4xl mx-auto game-anim">
-          {!gameState.gameOver && (
-            showPrediction ? (
-              <PredictionBanner 
-                winner={prediction?.winner as string} 
-                optimalMove={`Take ${prediction?.optimalMove}`} 
-                scoreDiff={prediction?.scoreDiff} 
-                onClose={() => setShowPrediction(false)}
-              />
-            ) : (
-              <OracleToggle onClick={() => setShowPrediction(true)} />
-            )
-          )}
-
-          <FrontTakeRow
-            piles={gameState.piles}
-            maxTake={3}
-            gameActive={!gameState.gameOver && !(gameMode === 'pve' && gameState.currentPlayer === 'Bob')}
-            onTake={handleTake}
-            optimalMove={showPrediction ? (prediction?.optimalMove as number | undefined) : undefined}
-          />
-        </div>
+      ) : (
+        <GameContentGrid
+          board={board}
+          boardControls={boardControls}
+          scores={gameState.scores}
+          currentPlayer={gameState.currentPlayer}
+          gameOver={gameState.gameOver}
+          winner={engine.getResult(gameState)}
+          gameMode={gameMode}
+          difficulty={difficulty}
+          history={gameState.history}
+          onReset={() => { setGameState(null); setShowPrediction(false); }}
+          replayData={gameState.gameOver ? {
+            gameId: 'stone-game-3',
+            initialConfig: inputVal,
+            moves: gameState.history.map(h => h.move),
+          } : undefined}
+        />
       )}
     </GameLayout>
   );

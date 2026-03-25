@@ -3,6 +3,7 @@ import { TicTacToeEngine } from '../games/TicTacToeEngine';
 import { applyMoveWithExplanation } from '../games/explainerUtility';
 import type { TicTacToeState } from '../games/TicTacToeEngine';
 import GameLayout from '../components/GameLayout';
+import GameContentGrid from '../components/GameContentGrid';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
@@ -15,7 +16,7 @@ export default function TicTacToePage() {
   const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
-  
+
   const engine = useMemo(() => new TicTacToeEngine(), []);
 
   useEffect(() => {
@@ -23,17 +24,11 @@ export default function TicTacToePage() {
       setPrediction(null);
       return;
     }
-
     let active = true;
     analysisService.analyze('tic-tac-toe', gameState, difficulty).then((res: any) => {
-      if (active) {
-        setPrediction(res);
-      }
+      if (active) setPrediction(res);
     });
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [showPrediction, gameState]);
 
   const startGame = () => {
@@ -57,11 +52,8 @@ export default function TicTacToePage() {
             setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'tic-tac-toe', prediction || undefined, difficulty) : null);
           }
         });
-      }, 500); 
-      return () => {
-        active = false;
-        clearTimeout(timer);
-      };
+      }, 500);
+      return () => { active = false; clearTimeout(timer); };
     }
   }, [gameState, gameMode, engine]);
 
@@ -71,21 +63,18 @@ export default function TicTacToePage() {
     if (!gameState) return null;
     const value = gameState.board[r][c];
     const isSelectable = gameActive && value === null;
-    
-    // Check if part of winning line
     const isWinningCell = gameState.winningLine?.some(p => p.row === r && p.col === c);
     const isOptimal = showPrediction && prediction?.optimalMove?.row === r && prediction?.optimalMove?.col === c;
 
     const rowNames = ['Top', 'Center', 'Bottom'];
     const colNames = ['Left', 'Center', 'Right'];
-    const cellName = `${rowNames[r]} ${colNames[c]}`;
 
     return (
       <button
         key={`${r}-${c}`}
         disabled={!isSelectable}
         onClick={() => handleCellClick(r, c)}
-        title={cellName}
+        title={`${rowNames[r]} ${colNames[c]}`}
         className={`
           relative w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center text-5xl sm:text-7xl font-sans transition-all duration-300
           border border-hextech-border/30 bg-hextech-dark/40
@@ -101,36 +90,42 @@ export default function TicTacToePage() {
   };
 
   const getOracleMoveText = () => {
-     if (!prediction?.optimalMove) return undefined;
-     const r = prediction.optimalMove.row;
-     const c = prediction.optimalMove.col;
-     const rowNames = ['Top', 'Center', 'Bot'];
-     const colNames = ['Left', 'Center', 'Right'];
-     return `${rowNames[r]} ${colNames[c]}`;
+    if (!prediction?.optimalMove) return undefined;
+    const rowNames = ['Top', 'Center', 'Bot'];
+    const colNames = ['Left', 'Center', 'Right'];
+    return `${rowNames[prediction.optimalMove.row]} ${colNames[prediction.optimalMove.col]}`;
   };
 
+  // Board JSX
+  const board = gameState && (
+    <div className="relative w-full aspect-square max-w-[400px] mx-auto">
+      <div className="grid grid-cols-3 grid-rows-3 gap-2 p-3 bg-[#050a0f] rounded-lg border border-hextech-gold/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] relative overflow-hidden h-full">
+        <div className="absolute inset-0 bg-gradient-to-br from-hextech-blue/5 via-transparent to-hextech-gold/5 pointer-events-none" />
+        <div className="absolute top-[33%] left-0 right-0 h-1 bg-gradient-to-r from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
+        <div className="absolute top-[66%] left-0 right-0 h-1 bg-gradient-to-r from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
+        <div className="absolute left-[33%] top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
+        <div className="absolute left-[66%] top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
+        {gameState.board.map((row, r) => row.map((_, c) => renderCell(r, c)))}
+      </div>
+    </div>
+  );
+
+  // Oracle controls — shown above board
+  const boardControls = gameState && !gameState.gameOver && (
+    showPrediction ? (
+      <PredictionBanner
+        winner={prediction?.winner as string}
+        optimalMove={getOracleMoveText()}
+        onClose={() => setShowPrediction(false)}
+      />
+    ) : (
+      <OracleToggle onClick={() => setShowPrediction(true)} />
+    )
+  );
+
   return (
-    <GameLayout
-      title="Tic Tac Toe"
-      isGameActive={gameState !== null}
-      scores={gameState?.scores}
-      showScore={true}
-      currentPlayer={gameState?.currentPlayer}
-      gameOver={gameState?.gameOver}
-      winner={gameState ? engine.getResult(gameState) : null}
-      history={gameState?.history}
-      replayData={gameState?.gameOver ? {
-        gameId: 'tic-tac-toe',
-        initialConfig: '',
-        moves: gameState.history.map(h => h.move)
-      } : undefined}
-      gameMode={gameMode}
-      difficulty={difficulty}
-      onReset={() => {
-        setGameState(null);
-        setShowPrediction(false);
-      }}
-      setupContent={
+    <GameLayout title="Tic Tac Toe">
+      {!gameState ? (
         <GameSetup
           title="Initialize Match"
           description={games.find(g => g.id === 'tic-tac-toe')?.description || ''}
@@ -142,37 +137,25 @@ export default function TicTacToePage() {
           onStart={startGame}
           hideInput={true}
         />
-      }
-    >
-      {gameState && (
-        <div className="flex flex-col items-center w-full max-w-4xl mx-auto game-anim">
-          {!gameState.gameOver && (
-            showPrediction ? (
-              <PredictionBanner 
-                winner={prediction?.winner as string} 
-                optimalMove={getOracleMoveText()}
-                onClose={() => setShowPrediction(false)}
-              />
-            ) : (
-              <OracleToggle onClick={() => setShowPrediction(true)} />
-            )
-          )}
-
-          <div className="relative mt-2 mb-10 w-fit">
-            <div className="grid grid-cols-3 grid-rows-3 gap-2 p-3 bg-[#050a0f] rounded-lg border border-hextech-gold/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] relative overflow-hidden">
-               {/* Background visual flair */}
-               <div className="absolute inset-0 bg-gradient-to-br from-hextech-blue/5 via-transparent to-hextech-gold/5 pointer-events-none" />
-               <div className="absolute top-[33%] left-0 right-0 h-1 bg-gradient-to-r from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
-               <div className="absolute top-[66%] left-0 right-0 h-1 bg-gradient-to-r from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
-               <div className="absolute left-[33%] top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
-               <div className="absolute left-[66%] top-0 bottom-0 w-1 bg-gradient-to-b from-transparent via-hextech-border/30 to-transparent pointer-events-none" />
-
-               {gameState.board.map((row, r) => (
-                  row.map((_, c) => renderCell(r, c))
-               ))}
-            </div>
-          </div>
-        </div>
+      ) : (
+        <GameContentGrid
+          board={board}
+          boardControls={boardControls}
+          scores={gameState.scores}
+          showScore={true}
+          currentPlayer={gameState.currentPlayer}
+          gameOver={gameState.gameOver}
+          winner={engine.getResult(gameState)}
+          gameMode={gameMode}
+          difficulty={difficulty}
+          history={gameState.history}
+          onReset={() => { setGameState(null); setShowPrediction(false); }}
+          replayData={gameState.gameOver ? {
+            gameId: 'tic-tac-toe',
+            initialConfig: '',
+            moves: gameState.history.map(h => h.move),
+          } : undefined}
+        />
       )}
     </GameLayout>
   );

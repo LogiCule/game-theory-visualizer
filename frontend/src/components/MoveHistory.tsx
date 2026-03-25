@@ -182,7 +182,7 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
   }, [history]);
 
   return (
-    <div className="bg-hextech-panel/60 backdrop-blur-md rounded-none shadow-2xl border border-hextech-border flex flex-col h-[500px] relative">
+    <div className="bg-hextech-panel/60 backdrop-blur-md rounded-none shadow-2xl border border-hextech-border flex flex-col h-full min-h-0 relative">
       <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-hextech-blue/50 opacity-50 m-1 pointer-events-none" />
 
       {/* Header */}
@@ -193,14 +193,13 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
         )}
       </div>
 
-      {/* Entries */}
-      <div ref={scrollRef} className="py-1.5 px-2 overflow-y-auto custom-scrollbar flex-grow">
+      {/* Entries — scrollable, matches board height */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto py-1.5 px-2 custom-scrollbar mask-gradient">
         {history.length === 0 ? (
-          <div className="text-hextech-border text-center mt-8 uppercase tracking-widest text-[10px]">
+          <div className="text-hextech-border text-center py-8 uppercase tracking-widest text-[10px]">
             Awaiting first move
           </div>
         ) : (
-          /* Step 6: generous spacing between moves */
           <ul className="space-y-1">
             {history.map((entry, i) => (
               <MoveEntry key={i} entry={entry} index={i} />
