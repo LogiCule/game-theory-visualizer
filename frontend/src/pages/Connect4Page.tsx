@@ -7,11 +7,13 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { analysisService } from '../services/analysisService';
+import { analysisService, loadDifficulty, saveDifficulty } from '../services/analysisService';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 export default function Connect4Page() {
   const [gameState, setGameState] = useState<Connect4State | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
   const [lastMove, setLastMove] = useState<{row: number, col: number} | null>(null);
@@ -27,7 +29,7 @@ export default function Connect4Page() {
     }
 
     let active = true;
-    analysisService.analyze('connect-4', gameState).then((res: any) => {
+    analysisService.analyze('connect-4', gameState, difficulty).then((res: any) => {
       if (active) {
         setPrediction(res);
       }
@@ -43,6 +45,7 @@ export default function Connect4Page() {
     setShowPrediction(false);
     setLastMove(null);
     setHint(null);
+    saveDifficulty(difficulty);
   };
 
   const getTargetRow = (board: (Player | null)[][], c: number) => {
@@ -65,13 +68,13 @@ export default function Connect4Page() {
       let active = true;
       setHint(null);
       const timer = setTimeout(() => {
-        analysisService.getBestMove('connect-4', gameState, (progress) => {
+        analysisService.getBestMove('connect-4', gameState, difficulty, (progress) => {
           if (active) setHint(progress.result);
         }).then(move => {
           if (active && move) {
             setHint(null);
             const targetRow = getTargetRow(gameState.board, move.col);
-            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'connect-4', prediction || undefined) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'connect-4', prediction || undefined, difficulty) : null);
             setLastMove({ row: targetRow, col: move.col });
           }
         });
@@ -136,6 +139,8 @@ export default function Connect4Page() {
         initialConfig: '',
         moves: gameState.history.map(h => h.move)
       } : undefined}
+      gameMode={gameMode}
+      difficulty={difficulty}
       onReset={() => {
         setGameState(null);
         setShowPrediction(false);
@@ -148,6 +153,8 @@ export default function Connect4Page() {
           rules={games.find(g => g.id === 'connect-4')?.rules || ''}
           gameMode={gameMode}
           setGameMode={setGameMode}
+          difficulty={difficulty}
+          setDifficulty={setDifficulty}
           onStart={startGame}
           hideInput={true}
         />

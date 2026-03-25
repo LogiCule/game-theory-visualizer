@@ -27,7 +27,7 @@ export abstract class TwoPlayerGameEngine<TState extends BaseGameState<TMove>, T
 
   public abstract getResult(state: TState): Player | "Tie" | null;
   
-  public abstract getOptimalMove?(state: TState): TMove | null;
+  public abstract getOptimalMove?(state: TState, depth?: number): TMove | null;
 
   public evaluate?(state: TState): number;
 

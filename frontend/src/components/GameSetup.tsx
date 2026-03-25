@@ -1,4 +1,5 @@
 import { Info } from 'lucide-react';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 interface GameSetupProps {
   title?: string;
@@ -9,9 +10,17 @@ interface GameSetupProps {
   setInputVal?: (val: string) => void;
   gameMode: 'pvp' | 'pve';
   setGameMode: (mode: 'pvp' | 'pve') => void;
+  difficulty?: AIDifficulty;
+  setDifficulty?: (d: AIDifficulty) => void;
   onStart: () => void;
   hideInput?: boolean;
 }
+
+const DIFFICULTIES: { value: AIDifficulty; label: string; color: string; glow: string }[] = [
+  { value: 'easy',   label: 'Easy',   color: 'border-emerald-500 text-emerald-400 bg-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.3)]',  glow: 'hover:border-emerald-400 hover:text-emerald-300' },
+  { value: 'medium', label: 'Medium', color: 'border-amber-500 text-amber-400 bg-amber-500/20 shadow-[0_0_10px_rgba(251,191,36,0.3)]',          glow: 'hover:border-amber-400 hover:text-amber-300' },
+  { value: 'hard',   label: 'Hard',   color: 'border-rose-500 text-rose-400 bg-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.3)]',             glow: 'hover:border-rose-400 hover:text-rose-300' },
+];
 
 export default function GameSetup({ 
   title = "Initialize Match", 
@@ -21,7 +30,9 @@ export default function GameSetup({
   inputVal, 
   setInputVal, 
   gameMode, 
-  setGameMode, 
+  setGameMode,
+  difficulty = 'hard',
+  setDifficulty,
   onStart,
   hideInput = false
 }: GameSetupProps) {
@@ -47,7 +58,8 @@ export default function GameSetup({
       
       <p className="text-gray-400 mb-8 font-light tracking-wide text-sm max-w-md mx-auto">{description}</p>
       
-      <div className="flex justify-center gap-4 mb-8">
+      {/* Game Mode Toggle */}
+      <div className="flex justify-center gap-4 mb-6">
         <button 
           onClick={() => setGameMode('pvp')}
           className={`px-6 py-2 uppercase tracking-widest text-sm font-bold border transition-colors ${gameMode === 'pvp' ? 'bg-hextech-blue/20 border-hextech-blue text-hextech-blue shadow-[0_0_10px_rgba(10,200,185,0.2)]' : 'border-hextech-border text-gray-500 hover:text-gray-300'} cursor-pointer`}
@@ -61,6 +73,36 @@ export default function GameSetup({
           PvE (vs Bob AI)
         </button>
       </div>
+
+      {/* AI Difficulty Selector (PvE only) */}
+      {gameMode === 'pve' && setDifficulty && (
+        <div className="mb-8 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="text-xs uppercase tracking-widest text-hextech-gold/60 mb-3 font-bold">AI Difficulty</div>
+          <div className="flex justify-center gap-3">
+            {DIFFICULTIES.map(({ value, label, color, glow }) => {
+              const isActive = difficulty === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => setDifficulty(value)}
+                  className={`
+                    relative px-5 py-2 text-sm font-bold uppercase tracking-widest border transition-all duration-200 cursor-pointer
+                    ${isActive ? color : 'border-hextech-border/50 text-gray-500 bg-transparent'}
+                    ${!isActive ? glow : ''}
+                  `}
+                >
+                  {label}
+                  {isActive && (
+                    <span className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full border-2 border-hextech-dark"
+                      style={{ background: value === 'easy' ? '#34d399' : value === 'medium' ? '#fbbf24' : '#f43f5e' }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
       
       {!hideInput && (
         <div className="flex flex-col sm:flex-row gap-0 group/input">
@@ -86,3 +128,4 @@ export default function GameSetup({
     </div>
   );
 }
+

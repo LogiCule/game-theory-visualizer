@@ -6,12 +6,14 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { analysisService } from '../services/analysisService';
+import { analysisService, loadDifficulty, saveDifficulty } from '../services/analysisService';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 export default function NimGamePage() {
   const [inputVal, setInputVal] = useState('10');
   const [gameState, setGameState] = useState<NimState | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   
@@ -24,7 +26,7 @@ export default function NimGamePage() {
     }
 
     let active = true;
-    analysisService.analyze('nim-game', gameState).then((res: any) => {
+    analysisService.analyze('nim-game', gameState, difficulty).then((res: any) => {
       if (active) {
         setPrediction(res);
       }
@@ -38,6 +40,7 @@ export default function NimGamePage() {
   const startGame = () => {
     setGameState(engine.getInitialState(inputVal));
     setShowPrediction(false);
+    saveDifficulty(difficulty);
   };
 
   const handleTake = (count: 1 | 2 | 3) => {
@@ -50,9 +53,9 @@ export default function NimGamePage() {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
       let active = true;
       const timer = setTimeout(() => {
-        analysisService.getBestMove('nim-game', gameState).then(move => {
+        analysisService.getBestMove('nim-game', gameState, difficulty).then(move => {
           if (active && move !== null) {
-            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'nim-game', prediction || undefined) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'nim-game', prediction || undefined, difficulty) : null);
           }
         });
       }, 1000);
@@ -81,6 +84,8 @@ export default function NimGamePage() {
         initialConfig: inputVal,
         moves: gameState.history.map(h => h.move)
       } : undefined}
+      gameMode={gameMode}
+      difficulty={difficulty}
       onReset={() => {
         setGameState(null);
         setShowPrediction(false);
@@ -94,6 +99,8 @@ export default function NimGamePage() {
           setInputVal={setInputVal}
           gameMode={gameMode}
           setGameMode={setGameMode}
+          difficulty={difficulty}
+          setDifficulty={setDifficulty}
           onStart={startGame}
         />
       }

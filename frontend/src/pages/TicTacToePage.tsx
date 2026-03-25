@@ -6,11 +6,13 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { analysisService } from '../services/analysisService';
+import { analysisService, loadDifficulty, saveDifficulty } from '../services/analysisService';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 export default function TicTacToePage() {
   const [gameState, setGameState] = useState<TicTacToeState | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   
@@ -23,7 +25,7 @@ export default function TicTacToePage() {
     }
 
     let active = true;
-    analysisService.analyze('tic-tac-toe', gameState).then((res: any) => {
+    analysisService.analyze('tic-tac-toe', gameState, difficulty).then((res: any) => {
       if (active) {
         setPrediction(res);
       }
@@ -37,6 +39,7 @@ export default function TicTacToePage() {
   const startGame = () => {
     setGameState(engine.getInitialState());
     setShowPrediction(false);
+    saveDifficulty(difficulty);
   };
 
   const handleCellClick = (r: number, c: number) => {
@@ -49,9 +52,9 @@ export default function TicTacToePage() {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
       let active = true;
       const timer = setTimeout(() => {
-        analysisService.getBestMove('tic-tac-toe', gameState).then(move => {
+        analysisService.getBestMove('tic-tac-toe', gameState, difficulty).then(move => {
           if (active && move) {
-            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'tic-tac-toe', prediction || undefined) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'tic-tac-toe', prediction || undefined, difficulty) : null);
           }
         });
       }, 500); 
@@ -121,6 +124,8 @@ export default function TicTacToePage() {
         initialConfig: '',
         moves: gameState.history.map(h => h.move)
       } : undefined}
+      gameMode={gameMode}
+      difficulty={difficulty}
       onReset={() => {
         setGameState(null);
         setShowPrediction(false);
@@ -132,6 +137,8 @@ export default function TicTacToePage() {
           rules={games.find(g => g.id === 'tic-tac-toe')?.rules || ''}
           gameMode={gameMode}
           setGameMode={setGameMode}
+          difficulty={difficulty}
+          setDifficulty={setDifficulty}
           onStart={startGame}
           hideInput={true}
         />

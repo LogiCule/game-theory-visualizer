@@ -7,12 +7,14 @@ import GameLayout from '../components/GameLayout';
 import GameSetup from '../components/GameSetup';
 import PredictionBanner, { OracleToggle } from '../components/PredictionBanner';
 import { games } from '../data/games';
-import { analysisService } from '../services/analysisService';
+import { analysisService, loadDifficulty, saveDifficulty } from '../services/analysisService';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 export default function StoneGamePage() {
   const [inputVal, setInputVal] = useState('5, 3, 4, 5');
   const [gameState, setGameState] = useState<StoneGameState | null>(null);
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>(loadDifficulty);
   const [showPrediction, setShowPrediction] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   
@@ -25,7 +27,7 @@ export default function StoneGamePage() {
     }
 
     let active = true;
-    analysisService.analyze('stone-game-1', gameState).then((res: any) => {
+    analysisService.analyze('stone-game-1', gameState, difficulty).then((res: any) => {
       if (active) {
         setPrediction(res);
       }
@@ -39,6 +41,7 @@ export default function StoneGamePage() {
   const startGame = () => {
     setGameState(engine.getInitialState(inputVal));
     setShowPrediction(false);
+    saveDifficulty(difficulty);
   };
 
   const handleTakeLeft = () => {
@@ -57,9 +60,9 @@ export default function StoneGamePage() {
     if (gameState && !gameState.gameOver && gameMode === 'pve' && gameState.currentPlayer === 'Bob') {
       let active = true;
       const timer = setTimeout(() => {
-        analysisService.getBestMove('stone-game-1', gameState).then(move => {
+        analysisService.getBestMove('stone-game-1', gameState, difficulty).then(move => {
           if (active && move) {
-            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'stone-game-1', prediction || undefined) : null);
+            setGameState(prev => prev ? applyMoveWithExplanation(engine, prev, move, 'stone-game-1', prediction || undefined, difficulty) : null);
           }
         });
       }, 1000);
@@ -84,6 +87,8 @@ export default function StoneGamePage() {
         initialConfig: inputVal,
         moves: gameState.history.map(h => h.move)
       } : undefined}
+      gameMode={gameMode}
+      difficulty={difficulty}
       onReset={() => {
         setGameState(null);
         setShowPrediction(false);
@@ -97,6 +102,8 @@ export default function StoneGamePage() {
           setInputVal={setInputVal}
           gameMode={gameMode}
           setGameMode={setGameMode}
+          difficulty={difficulty}
+          setDifficulty={setDifficulty}
           onStart={startGame}
         />
       }

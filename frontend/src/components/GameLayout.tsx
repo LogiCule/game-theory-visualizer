@@ -7,6 +7,7 @@ import { useGSAP } from '@gsap/react';
 import ScoreBoard from './ScoreBoard';
 import TurnIndicator from './TurnIndicator';
 import MoveHistory from './MoveHistory';
+import type { AIDifficulty } from '../ai/AIStrategy';
 
 interface GameLayoutProps {
   title: string;
@@ -26,6 +27,10 @@ interface GameLayoutProps {
     moves: any[];
   };
   
+  // Game mode & difficulty (for winner banner display)
+  gameMode?: 'pvp' | 'pve';
+  difficulty?: AIDifficulty;
+
   // Actions
   onReset?: () => void;
 
@@ -44,6 +49,8 @@ export default function GameLayout({
   winner,
   history,
   replayData,
+  gameMode,
+  difficulty,
   onReset,
   children
 }: GameLayoutProps) {
@@ -98,7 +105,9 @@ export default function GameLayout({
                   <TurnIndicator 
                     currentPlayer={currentPlayer} 
                     gameOver={gameOver} 
-                    winner={winner} 
+                    winner={winner}
+                    gameMode={gameMode}
+                    difficulty={difficulty}
                   />
                 </div>
               )}
