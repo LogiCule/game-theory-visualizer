@@ -3,6 +3,7 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { getEngineForGame } from '../games/engineRegistry';
 import GameLayout from '../components/GameLayout';
+import GameContentGrid from '../components/GameContentGrid';
 import PileRow from '../components/PileRow';
 import FrontTakeRow from '../components/FrontTakeRow';
 
@@ -155,7 +156,7 @@ export default function ReplayPage() {
         );
       case 'tic-tac-toe':
         return (
-          <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
+          <div className="flex flex-col items-center w-full max-w-4xl mx-auto min-h-[400px] justify-center">
             <div className="relative mt-2 mb-10 w-fit">
               <div className="grid grid-cols-3 grid-rows-3 gap-2 p-3 bg-[#050a0f] rounded-lg border border-hextech-gold/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] relative overflow-hidden">
                  <div className="absolute inset-0 bg-gradient-to-br from-hextech-blue/5 via-transparent to-hextech-gold/5 pointer-events-none" />
@@ -189,7 +190,7 @@ export default function ReplayPage() {
         );
       case 'connect-4':
         return (
-          <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
+          <div className="flex flex-col items-center w-full max-w-4xl mx-auto min-h-[400px] justify-center">
             <div className="relative mt-2 mb-10 w-fit">
               <div className={`
                 grid grid-cols-7 grid-rows-6 gap-0 p-[2px] bg-hextech-dark/80 rounded border-2 border-hextech-blue/30 shadow-[0_0_40px_rgba(0,0,0,0.6)] relative overflow-hidden
@@ -242,18 +243,8 @@ export default function ReplayPage() {
     return id.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ') + ' Replay';
   };
 
-  return (
-    <GameLayout
-      title={formatTitle(gameId)}
-      isGameActive={true}
-      scores={gameState.scores}
-      showScore={gameId !== 'nim-game'}
-      currentPlayer={gameState.currentPlayer}
-      gameOver={gameState.gameOver}
-      winner={engine.getResult(gameState)}
-      history={gameState.history}
-      setupContent={null}
-    >
+  const board = (
+    <div className="flex flex-col items-center w-full">
       <style>{`
         @keyframes connect4Drop {
           0% { transform: translateY(-400px); opacity: 0; }
@@ -268,70 +259,83 @@ export default function ReplayPage() {
           100% { transform: scale(1); opacity: 1; }
         }
       `}</style>
-      <div className="flex flex-col items-center w-full">
-        {/* Playback Controls */}
-        <div className="bg-hextech-dark/80 border border-hextech-blue/40 px-6 py-4 mb-8 flex items-center gap-6 shadow-lg shadow-hextech-blue/10 backdrop-blur-md w-full max-w-2xl rounded-sm">
-          <button 
-            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-            disabled={isPlaying || currentStep === 0}
-            className="text-hextech-gold hover:text-hextech-gold-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-          >
-            <SkipBack size={24} />
-          </button>
+      
+      {/* Playback Controls */}
+      <div className="bg-hextech-dark/80 border border-hextech-blue/40 px-6 py-4 mb-8 flex items-center gap-6 shadow-lg shadow-hextech-blue/10 backdrop-blur-md w-full max-w-2xl rounded-sm">
+        <button 
+          onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+          disabled={isPlaying || currentStep === 0}
+          className="text-hextech-gold hover:text-hextech-gold-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        >
+          <SkipBack size={24} />
+        </button>
 
-          <button 
-            onClick={() => {
-              if (currentStep === states.length - 1) {
-                setCurrentStep(0);
-                setIsPlaying(true);
-              } else {
-                setIsPlaying(!isPlaying);
-              }
+        <button 
+          onClick={() => {
+            if (currentStep === states.length - 1) {
+              setCurrentStep(0);
+              setIsPlaying(true);
+            } else {
+              setIsPlaying(!isPlaying);
+            }
+          }}
+          className="w-14 h-14 flex items-center justify-center bg-hextech-blue/10 border border-hextech-blue text-hextech-blue hover:bg-hextech-blue/20 transition-all rounded-full shadow-[0_0_15px_rgba(10,200,185,0.2)] hover:shadow-[0_0_25px_rgba(10,200,185,0.4)] hover:scale-105 cursor-pointer"
+        >
+          {currentStep === states.length - 1 ? (
+             <RotateCcw size={24} />
+          ) : isPlaying ? (
+             <Pause size={24} />
+          ) : (
+             <Play size={24} className="ml-1" />
+          )}
+        </button>
+
+        <button 
+          onClick={() => setCurrentStep(Math.min(states.length - 1, currentStep + 1))}
+          disabled={isPlaying || currentStep === states.length - 1}
+          className="text-hextech-gold hover:text-hextech-gold-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        >
+          <SkipForward size={24} />
+        </button>
+
+        <div className="flex-1 flex flex-col ml-4">
+          <span className="text-xs text-hextech-blue uppercase tracking-widest font-bold mb-2">
+            Turn {currentStep} / {states.length - 1}
+          </span>
+          <input 
+            type="range" 
+            min="0" 
+            max={states.length - 1} 
+            value={currentStep}
+            onChange={(e) => {
+              setIsPlaying(false);
+              setCurrentStep(parseInt(e.target.value));
             }}
-            className="w-14 h-14 flex items-center justify-center bg-hextech-blue/10 border border-hextech-blue text-hextech-blue hover:bg-hextech-blue/20 transition-all rounded-full shadow-[0_0_15px_rgba(10,200,185,0.2)] hover:shadow-[0_0_25px_rgba(10,200,185,0.4)] hover:scale-105 cursor-pointer"
-          >
-            {currentStep === states.length - 1 ? (
-               <RotateCcw size={24} />
-            ) : isPlaying ? (
-               <Pause size={24} />
-            ) : (
-               <Play size={24} className="ml-1" />
-            )}
-          </button>
-
-          <button 
-            onClick={() => setCurrentStep(Math.min(states.length - 1, currentStep + 1))}
-            disabled={isPlaying || currentStep === states.length - 1}
-            className="text-hextech-gold hover:text-hextech-gold-light disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
-          >
-            <SkipForward size={24} />
-          </button>
-
-          <div className="flex-1 flex flex-col ml-4">
-            <span className="text-xs text-hextech-blue uppercase tracking-widest font-bold mb-2">
-              Turn {currentStep} / {states.length - 1}
-            </span>
-            <input 
-              type="range" 
-              min="0" 
-              max={states.length - 1} 
-              value={currentStep}
-              onChange={(e) => {
-                setIsPlaying(false);
-                setCurrentStep(parseInt(e.target.value));
-              }}
-              className="w-full h-1 bg-hextech-border appearance-none rounded-none accent-hextech-blue cursor-pointer outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Board View */}
-        <div className="w-full relative">
-          {/* Overlay to absolutely prevent any interaction in replay mode */}
-          <div className="absolute inset-0 z-50 pointer-events-auto" />
-          {renderBoard()}
+            className="w-full h-1 bg-hextech-border appearance-none rounded-none accent-hextech-blue cursor-pointer outline-none"
+          />
         </div>
       </div>
+
+      {/* Board View */}
+      <div className="w-full relative">
+        {/* Overlay to absolutely prevent any interaction in replay mode */}
+        <div className="absolute inset-0 z-50 pointer-events-auto" />
+        {renderBoard()}
+      </div>
+    </div>
+  );
+
+  return (
+    <GameLayout title={formatTitle(gameId)}>
+      <GameContentGrid
+        board={board}
+        scores={gameState.scores}
+        showScore={gameId !== 'nim-game'}
+        currentPlayer={gameState.currentPlayer}
+        gameOver={gameState.gameOver}
+        winner={engine.getResult(gameState)}
+        history={gameState.history}
+      />
     </GameLayout>
   );
 }
