@@ -105,11 +105,11 @@ function MoveEntry({ entry, index }: { entry: HistoryEntry<any>; index: number }
                 </span>
               )}
             </span>
-          ) : (
-            <span className="text-[13px] font-bold text-hextech-gold-light/70 leading-none">
-              {exp?.summary ?? entry.description}
-            </span>
-          )}
+          ) : null}
+
+          <span className={`text-[13px] font-bold ${style ? 'text-hextech-gold-light/80 font-medium ml-1' : 'text-hextech-gold-light/90'} leading-none`}>
+            {exp?.summary ?? entry.description}
+          </span>
 
           {/* Step 2: Confidence inline — colored dot + short label */}
           {conf && (
@@ -189,14 +189,14 @@ export default function MoveHistory({ history }: MoveHistoryProps) {
       <div className="bg-hextech-dark/50 border-b border-hextech-border px-5 py-3 flex items-center justify-between">
         <h3 className="font-bold text-hextech-gold uppercase tracking-widest text-[11px]">Match Log</h3>
         {history.length > 0 && (
-          <span className="text-[10px] text-hextech-gold/25 tabular-nums">{history.length} move{history.length !== 1 ? 's' : ''}</span>
+          <span className="text-[10px] text-hextech-gold/90 tabular-nums font-bold">{history.length} move{history.length !== 1 ? 's' : ''}</span>
         )}
       </div>
 
       {/* Entries — scrollable, matches board height */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto py-1.5 px-2 custom-scrollbar mask-gradient">
         {history.length === 0 ? (
-          <div className="text-hextech-border text-center py-8 uppercase tracking-widest text-[10px]">
+          <div className="text-hextech-gold-light/50 text-center py-8 uppercase tracking-widest text-[10px]">
             Awaiting first move
           </div>
         ) : (

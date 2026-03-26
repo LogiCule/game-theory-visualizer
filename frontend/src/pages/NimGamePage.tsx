@@ -134,7 +134,7 @@ export default function NimGamePage() {
           replayData={gameState.gameOver ? {
             gameId: 'nim-game',
             initialConfig: inputVal,
-            moves: gameState.history.map(h => h.move),
+            history: gameState.history,
           } : undefined}
         />
       )}

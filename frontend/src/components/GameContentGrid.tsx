@@ -29,7 +29,8 @@ interface GameContentGridProps {
 
   // Post-game actions
   onReset?: () => void;
-  replayData?: { gameId: string; initialConfig: string; moves: any[] };
+  replayData?: { gameId: string; initialConfig: string; history: any[] };
+  isReplay?: boolean;
 }
 
 /**
@@ -54,6 +55,7 @@ export default function GameContentGrid({
   history,
   onReset,
   replayData,
+  isReplay,
 }: GameContentGridProps) {
   const navigate = useNavigate();
 
@@ -83,6 +85,7 @@ export default function GameContentGrid({
                 winner={winner}
                 gameMode={gameMode}
                 difficulty={difficulty}
+                isReplay={isReplay}
               />
             </div>
           )}

@@ -8,6 +8,7 @@ interface TurnIndicatorProps {
   winner: string | null;
   gameMode?: 'pvp' | 'pve';
   difficulty?: AIDifficulty;
+  isReplay?: boolean;
 }
 
 const DIFFICULTY_BADGE: Record<AIDifficulty, { label: string; color: string }> = {
@@ -16,7 +17,7 @@ const DIFFICULTY_BADGE: Record<AIDifficulty, { label: string; color: string }> =
   hard:   { label: 'Hard',   color: 'text-rose-400 border-rose-500/50 bg-rose-500/10' },
 };
 
-export default function TurnIndicator({ currentPlayer, gameOver, winner, gameMode, difficulty }: TurnIndicatorProps) {
+export default function TurnIndicator({ currentPlayer, gameOver, winner, gameMode, difficulty, isReplay }: TurnIndicatorProps) {
   if (gameOver) {
     const isPve = gameMode === 'pve';
     const badge = isPve && difficulty ? DIFFICULTY_BADGE[difficulty] : null;
@@ -59,7 +60,7 @@ export default function TurnIndicator({ currentPlayer, gameOver, winner, gameMod
         ${colorClass}
       `}>
         <User size={18} className={iconColor} />
-        <span>Awaiting {currentPlayer}</span>
+        <span>{isReplay ? `${currentPlayer}'s Turn` : `Awaiting ${currentPlayer}`}</span>
       </div>
     </div>
   );

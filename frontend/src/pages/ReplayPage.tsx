@@ -9,7 +9,7 @@ import FrontTakeRow from '../components/FrontTakeRow';
 
 export default function ReplayPage() {
   const location = useLocation();
-  const replayData = location.state as { gameId: string; initialConfig: string; moves: any[] };
+  const replayData = location.state as { gameId: string; initialConfig: string; history: any[] };
 
   if (!replayData || !replayData.gameId) {
     return (
@@ -38,7 +38,7 @@ export default function ReplayPage() {
     );
   }
 
-  const { gameId, initialConfig, moves } = replayData;
+  const { gameId, initialConfig, history } = replayData;
 
   const { engine, states } = useMemo(() => {
     const eng = getEngineForGame(gameId);
@@ -46,15 +46,19 @@ export default function ReplayPage() {
 
     const st = [eng.getInitialState(initialConfig)];
     let currentState = st[0];
-    for (const move of moves) {
-      currentState = eng.makeMove(currentState, move);
+    for (const entry of (history || [])) {
+      currentState = eng.makeMove(currentState, entry.move);
+      // Copy explanation if it exists
+      if (entry.explanation && currentState.history.length > 0) {
+        currentState.history[currentState.history.length - 1].explanation = entry.explanation;
+      }
       st.push(currentState);
     }
     return { engine: eng, states: st };
-  }, [gameId, initialConfig, moves]);
+  }, [gameId, initialConfig, history]);
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   useEffect(() => {
     if (isPlaying && currentStep < states.length - 1) {
@@ -330,11 +334,12 @@ export default function ReplayPage() {
       <GameContentGrid
         board={board}
         scores={gameState.scores}
-        showScore={gameId !== 'nim-game'}
+        showScore={gameId !== 'nim-game' && gameId !== 'tic-tac-toe' && gameId !== 'connect-4'}
         currentPlayer={gameState.currentPlayer}
         gameOver={gameState.gameOver}
         winner={engine.getResult(gameState)}
         history={gameState.history}
+        isReplay={true}
       />
     </GameLayout>
   );

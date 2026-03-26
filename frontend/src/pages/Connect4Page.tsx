@@ -187,7 +187,7 @@ export default function Connect4Page() {
           board={board}
           boardControls={boardControls}
           scores={gameState.scores}
-          showScore={true}
+          showScore={false}
           currentPlayer={gameState.currentPlayer}
           gameOver={gameState.gameOver}
           winner={engine.getResult(gameState)}
@@ -198,7 +198,7 @@ export default function Connect4Page() {
           replayData={gameState.gameOver ? {
             gameId: 'connect-4',
             initialConfig: '',
-            moves: gameState.history.map(h => h.move),
+            history: gameState.history,
           } : undefined}
         />
       )}

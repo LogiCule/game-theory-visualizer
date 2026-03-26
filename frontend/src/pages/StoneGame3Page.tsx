@@ -104,7 +104,7 @@ export default function StoneGame3Page() {
           replayData={gameState.gameOver ? {
             gameId: 'stone-game-3',
             initialConfig: inputVal,
-            moves: gameState.history.map(h => h.move),
+            history: gameState.history,
           } : undefined}
         />
       )}

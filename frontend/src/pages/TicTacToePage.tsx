@@ -142,7 +142,7 @@ export default function TicTacToePage() {
           board={board}
           boardControls={boardControls}
           scores={gameState.scores}
-          showScore={true}
+          showScore={false}
           currentPlayer={gameState.currentPlayer}
           gameOver={gameState.gameOver}
           winner={engine.getResult(gameState)}
@@ -153,7 +153,7 @@ export default function TicTacToePage() {
           replayData={gameState.gameOver ? {
             gameId: 'tic-tac-toe',
             initialConfig: '',
-            moves: gameState.history.map(h => h.move),
+            history: gameState.history,
           } : undefined}
         />
       )}
