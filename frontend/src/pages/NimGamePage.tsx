@@ -135,6 +135,8 @@ export default function NimGamePage() {
             gameId: 'nim-game',
             initialConfig: inputVal,
             history: gameState.history,
+            gameMode,
+            difficulty,
           } : undefined}
         />
       )}

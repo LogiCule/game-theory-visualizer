@@ -29,7 +29,13 @@ interface GameContentGridProps {
 
   // Post-game actions
   onReset?: () => void;
-  replayData?: { gameId: string; initialConfig: string; history: any[] };
+  replayData?: { 
+    gameId: string; 
+    initialConfig: string; 
+    history: any[]; 
+    gameMode?: 'pvp' | 'pve';
+    difficulty?: AIDifficulty;
+  };
   isReplay?: boolean;
 }
 
@@ -73,6 +79,10 @@ export default function GameContentGrid({
                 aliceScore={scores.Alice}
                 bobScore={scores.Bob}
                 showScore={showScore}
+                gameOver={gameOver}
+                winner={winner}
+                gameMode={gameMode}
+                difficulty={difficulty}
               />
             </div>
           )}
@@ -82,9 +92,6 @@ export default function GameContentGrid({
               <TurnIndicator
                 currentPlayer={currentPlayer}
                 gameOver={gameOver}
-                winner={winner}
-                gameMode={gameMode}
-                difficulty={difficulty}
                 isReplay={isReplay}
               />
             </div>

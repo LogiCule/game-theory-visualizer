@@ -9,7 +9,13 @@ import FrontTakeRow from '../components/FrontTakeRow';
 
 export default function ReplayPage() {
   const location = useLocation();
-  const replayData = location.state as { gameId: string; initialConfig: string; history: any[] };
+  const replayData = location.state as { 
+    gameId: string; 
+    initialConfig: string; 
+    history: any[];
+    gameMode?: 'pvp' | 'pve';
+    difficulty?: any; 
+  };
 
   if (!replayData || !replayData.gameId) {
     return (
@@ -38,7 +44,7 @@ export default function ReplayPage() {
     );
   }
 
-  const { gameId, initialConfig, history } = replayData;
+  const { gameId, initialConfig, history, gameMode, difficulty } = replayData;
 
   const { engine, states } = useMemo(() => {
     const eng = getEngineForGame(gameId);
@@ -338,6 +344,8 @@ export default function ReplayPage() {
         currentPlayer={gameState.currentPlayer}
         gameOver={gameState.gameOver}
         winner={engine.getResult(gameState)}
+        gameMode={gameMode}
+        difficulty={difficulty}
         history={gameState.history}
         isReplay={true}
       />

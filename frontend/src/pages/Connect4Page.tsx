@@ -199,6 +199,8 @@ export default function Connect4Page() {
             gameId: 'connect-4',
             initialConfig: '',
             history: gameState.history,
+            gameMode,
+            difficulty,
           } : undefined}
         />
       )}

@@ -105,6 +105,8 @@ export default function StoneGame2Page() {
             gameId: 'stone-game-2',
             initialConfig: inputVal,
             history: gameState.history,
+            gameMode,
+            difficulty,
           } : undefined}
         />
       )}

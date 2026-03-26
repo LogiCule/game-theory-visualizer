@@ -154,6 +154,8 @@ export default function TicTacToePage() {
             gameId: 'tic-tac-toe',
             initialConfig: '',
             history: gameState.history,
+            gameMode,
+            difficulty,
           } : undefined}
         />
       )}
